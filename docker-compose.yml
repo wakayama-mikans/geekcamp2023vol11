@@ -1,34 +1,33 @@
 version: "3.8"
+
 services:
-  #バックエンド
-  src:
-    container_name: geek_src
+  #node.js
+  node:
+    container_name: node
     # for Apple Silicon Mac
-    # platform: linux/arm64/v8
+    platform: linux/arm64/v8
     build:
       context: ./
       dockerfile: Dockerfile
     volumes:
-      - ./:/app
+      - .:/app
     tty: true
     ports:
-      - 8080:80
+      - 80:80
 
-  # #ngrok(LINEbot ローカル動作確認用)
-  # ngrok:
-  #   container_name: ngrok
-  #   image: wernight/ngrok:latest
-  #   volumes:
-  #     - ./ngrok.yml:/home/ngrok/.ngrok2/ngrok.yml
-  #   ports:
-  #     - ${NGROK_FRONT_PORT:-4040}:4040
-  #   environment:
-  #     NGROK_FRONT_PORT: front:3000
-  #     NGROK_AUTH: ${NGROK_AUTH_TOKUN}
-  #   # depends_on:
-  #   #   - front
-  #   networks:
-  #     - default
+  #ngrok(LINEbot ローカル動作確認用)
+  ngrok:
+    container_name: ngrok
+    image: wernight/ngrok:latest
+    volumes:
+      - ./ngrok.yml:/home/ngrok/.ngrok2/ngrok.yml
+    ports:
+      - ${NGROK_PORT:-4040}:4040
+    environment:
+      NGROK_PORT: node:80
+      NGROK_AUTH: ${NGROK_AUTH_TOKUN}
+    networks:
+      - default
 
 volumes:
   node_modules_volume:

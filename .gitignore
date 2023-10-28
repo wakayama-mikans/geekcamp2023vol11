@@ -1,3 +1,3 @@
+.DS_Store
 .env
-/src/.env
-/src/*.log
+node_modules
