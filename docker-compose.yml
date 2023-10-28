@@ -1,15 +1,15 @@
 version: "3.8"
 services:
   #バックエンド
-  back:
-    container_name: geek_back
+  src:
+    container_name: geek_src
     # for Apple Silicon Mac
     # platform: linux/arm64/v8
     build:
-      context: ./back
+      context: ./src
       dockerfile: Dockerfile
     volumes:
-      - ./back:/src
+      - ./src:/src
     ports:
       - 8080:80
 

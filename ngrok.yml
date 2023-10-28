@@ -3,9 +3,9 @@ version: 2
 #authtoken: $NGROK_AUTH_TOKEN
 web_addr: 0.0.0.0:4040
 tunnels:
-  back:
+  src:
     proto: http
-    addr: back:80
+    addr: src:80
     inspect: false
 # regionをJapanに変更
 region: jp
