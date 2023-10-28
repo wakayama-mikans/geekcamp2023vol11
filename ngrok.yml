@@ -1,0 +1,12 @@
+version: 2
+# reference: https://ngrok.com/docs/ngrok-agent/config/
+#authtoken: $NGROK_AUTH_TOKEN
+web_addr: 0.0.0.0:4040
+tunnels:
+  back:
+    proto: http
+    addr: back:80
+    inspect: false
+# regionをJapanに変更
+region: jp
+authtoken: 2OSVyBxKGYk2ez18rk6O5Q5CMAY_5c2Q7B51fvh4RxGZ4YK26

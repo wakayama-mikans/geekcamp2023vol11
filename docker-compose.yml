@@ -3,6 +3,8 @@ services:
   #バックエンド
   back:
     container_name: geek_back
+    # for Apple Silicon Mac
+    platform: linux/arm64/v8
     build:
       context: ./back
       dockerfile: Dockerfile
