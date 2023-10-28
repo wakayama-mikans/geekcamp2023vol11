@@ -7,7 +7,7 @@ services:
       context: ./back
       dockerfile: Dockerfile
     volumes:
-      - ./back:/var/www/html
+      - ./back:/src
     ports:
       - 8080:80
 
