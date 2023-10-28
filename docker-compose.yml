@@ -1,0 +1,88 @@
+version: "3.8"
+services:
+  #フロントエンド
+  front:
+    container_name: susan-liff-next_front
+    build:
+      context: ./front
+      dockerfile: Dockerfile
+    tty: true
+    environment:
+      #- CHOKIDAR_USEPOLLING=true # ホットリロードを有効にする(js)
+      - WATCHPACK_POLLING=true # ホットリロードを有効にする(ts)
+    ports:
+      - "3000:3000" # 開発用
+      - "4000:4000" # 本番用
+    networks:
+      - default
+    volumes:
+      - ./front:/home/app
+      - node_modules_volume:/home/app/node_modules:delegated
+      - build_volume:/home/app/build:nocopy
+    # command: yarn dev
+
+  #バックエンド
+  back:
+    container_name: susan_back
+    build:
+      context: ./back
+      dockerfile: Dockerfile
+    volumes:
+      - ./back:/var/www/html
+      - ./back/php.ini:/usr/local/etc/php/php.ini
+    ports:
+      - 8080:80
+    depends_on:
+      - mysql
+
+  #MySQL用コンテナ
+  mysql:
+    container_name: mysql
+    # for Apple Silicon Mac
+    platform: linux/arm64/v8
+    build:
+      context: ./mysql
+      dockerfile: Dockerfile
+    volumes:
+      - ./mysql/data:/var/lib/mysql
+      - ./mysql/initdb.d:/docker-entrypoint-initdb.d
+    ports:
+      - 3306:3306
+    environment:
+      - MYSQL_ROOT_HOST='%'
+      - MYSQL_ROOT_PASSWORD=$MYSQL_ROOT_PASSWORD
+      - MYSQL_DATABASE=$MYSQL_DATABASE
+      - MYSQL_USER=$MYSQL_USER
+      - MYSQL_PASSWORD=$MYSQL_PASSWORD
+
+  #phpMyAdmin用コンテナ
+  phpmyadmin:
+    container_name: phpMyAdmin
+    depends_on:
+      - mysql
+    image: phpmyadmin:latest
+    environment:
+      PMA_HOST: mysql
+    restart: always
+    ports:
+      - "80:80"
+
+  #ngrok(LINEbot ローカル動作確認用)
+  ngrok:
+    container_name: ngrok
+    image: wernight/ngrok:latest
+    volumes:
+      - ./ngrok.yml:/home/ngrok/.ngrok2/ngrok.yml
+    ports:
+      - ${NGROK_FRONT_PORT:-4040}:4040
+    environment:
+      NGROK_FRONT_PORT: front:3000
+      NGROK_AUTH: ${NGROK_AUTH_TOKEN}
+    depends_on:
+      - front
+    networks:
+      - default
+
+volumes:
+  node_modules_volume:
+  build_volume:
