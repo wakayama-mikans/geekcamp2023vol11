@@ -8,5 +8,9 @@ WORKDIR /src
 # RUN yarn install
 # COPY . $APP_ROOT
 
-EXPOSE 3000
+# COPY ./package.json ./package-lock.json ./
+# RUN npm install
+
+# EXPOSE 80
 # CMD ["yarn", "dev"]
+# CMD ["npm", "run", "start"]
