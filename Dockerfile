@@ -1,7 +1,10 @@
 FROM node:16.15-alpine
 WORKDIR /app
 
-COPY ./package.json ./package-lock.json ./
+COPY ./package.json /app
+COPY ./package-lock.json /app
 
-CMD ["npm", "install"]
+RUN npm install
+
+COPY . /app
 CMD ["npm", "run", "start"]
