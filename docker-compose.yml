@@ -4,7 +4,7 @@ services:
   back:
     container_name: geek_back
     # for Apple Silicon Mac
-    platform: linux/arm64/v8
+    # platform: linux/arm64/v8
     build:
       context: ./back
       dockerfile: Dockerfile
@@ -23,7 +23,7 @@ services:
       - ${NGROK_FRONT_PORT:-4040}:4040
     environment:
       NGROK_FRONT_PORT: front:3000
-      NGROK_AUTH: 2OSVyBxKGYk2ez18rk6O5Q5CMAY_5c2Q7B51fvh4RxGZ4YK26
+      NGROK_AUTH: ${NGROK_AUTH_TOKUN}
     # depends_on:
     #   - front
     networks:
