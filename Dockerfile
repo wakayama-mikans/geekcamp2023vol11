@@ -1,7 +1,7 @@
 FROM node:16.15-alpine
 # ENV APP_ROOT /home/app
 
-WORKDIR /src
+WORKDIR /app
 
 # COPY ./package.json $APP_ROOT
 # COPY ./yarn.lock $APP_ROOT

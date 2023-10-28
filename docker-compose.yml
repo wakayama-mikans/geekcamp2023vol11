@@ -1,4 +1,5 @@
 version: "3.8"
+
 services:
   #node.js
   node:
@@ -6,29 +7,29 @@ services:
     # for Apple Silicon Mac
     platform: linux/arm64/v8
     build:
-      context: ./src
+      context: ./
       dockerfile: Dockerfile
     volumes:
-      - ./src:/src
+      - .:/app
     tty: true
     ports:
-      - 80:80
+      - 8080:80
 
-  #ngrok(LINEbot ローカル動作確認用)
-  ngrok:
-    container_name: ngrok
-    image: wernight/ngrok:latest
-    volumes:
-      - ./ngrok.yml:/home/ngrok/.ngrok2/ngrok.yml
-    ports:
-      - 4040:4040
-    environment:
-      NGROK_AUTH: ${NGROK_AUTH_TOKUN}
-    # depends_on:
-    #   - front
-    networks:
-      - default
+  # #ngrok(LINEbot ローカル動作確認用)
+  # ngrok:
+  #   container_name: ngrok
+  #   image: wernight/ngrok:latest
+  #   volumes:
+  #     - ./ngrok.yml:/home/ngrok/.ngrok2/ngrok.yml
+  #   ports:
+  #     - 4040:4040
+  #   environment:
+  #     NGROK_AUTH: ${NGROK_AUTH_TOKUN}
+  #   # depends_on:
+  #   #   - front
+  #   networks:
+  #     - default
 
-volumes:
-  node_modules_volume:
-  build_volume:
+# volumes:
+#   node_modules_volume:
+#   build_volume:
