@@ -3,8 +3,8 @@ ENV APP_ROOT /home/app
 
 WORKDIR $APP_ROOT
 
-COPY ./package.json $APP_ROOT
-COPY ./yarn.lock $APP_ROOT
+# COPY ./package.json $APP_ROOT
+# COPY ./yarn.lock $APP_ROOT
 
 RUN yarn install 
 

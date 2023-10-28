@@ -22,8 +22,8 @@ services:
     environment:
       NGROK_FRONT_PORT: front:3000
       NGROK_AUTH: 2OSVyBxKGYk2ez18rk6O5Q5CMAY_5c2Q7B51fvh4RxGZ4YK26
-    depends_on:
-      - front
+    # depends_on:
+    #   - front
     networks:
       - default
 
