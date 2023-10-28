@@ -13,23 +13,22 @@ services:
       - .:/app
     tty: true
     ports:
-      - 3000:3000
+      - 80:80
 
-  # #ngrok(LINEbot ローカル動作確認用)
-  # ngrok:
-  #   container_name: ngrok
-  #   image: wernight/ngrok:latest
-  #   volumes:
-  #     - ./ngrok.yml:/home/ngrok/.ngrok2/ngrok.yml
-  #   ports:
-  #     - 4040:4040
-  #   environment:
-  #     NGROK_AUTH: ${NGROK_AUTH_TOKUN}
-  #   # depends_on:
-  #   #   - front
-  #   networks:
-  #     - default
+  #ngrok(LINEbot ローカル動作確認用)
+  ngrok:
+    container_name: ngrok
+    image: wernight/ngrok:latest
+    volumes:
+      - ./ngrok.yml:/home/ngrok/.ngrok2/ngrok.yml
+    ports:
+      - ${NGROK_PORT:-4040}:4040
+    environment:
+      NGROK_PORT: node:80
+      NGROK_AUTH: ${NGROK_AUTH_TOKUN}
+    networks:
+      - default
 
-# volumes:
-#   node_modules_volume:
-#   build_volume:
+volumes:
+  node_modules_volume:
+  build_volume:
