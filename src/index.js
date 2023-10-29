@@ -4,6 +4,7 @@ const express = require("express");
 const line = require("@line/bot-sdk");
 const PORT = process.env.EXPRESS_PORT;
 const {insertData,getData} = require("./database.js"); // データベース関連の関数をdatabase.jsから読み込む
+const { getAnalyzedWord } = require("./analysiswords.js"); // 形態素解析関連の関数をanalysiswords.jsから読み込む
 
 const config = {
   channelSecret: process.env.LINE_CHANNEL_SECRET,
@@ -34,7 +35,15 @@ async function handleEvent(event) {
   insertData(userId,text); // database.jsのgetData関数を呼び出す
 
   const getDataResult = await getData(userId); // database.jsのgetData関数を呼び出す
-  // let mes = { type: "text", text: getDataResult[0] };
+
+  words = await getAnalyzedWord("みなりかけるは天才だ！")
+    .then((response) => {
+      return JSON.parse(response);
+    })
+    .catch((error) => {
+      console.error(error);
+    }); // analysiswords.jsのanalyzeWords関数を呼び出す
+  console.log(words.result.tokens);
 
   return client.replyMessage(event.replyToken, mes);
 }
