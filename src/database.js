@@ -1,0 +1,50 @@
+// Firebase用の設定
+const {
+  initializeApp,
+  applicationDefault,
+  cert,
+} = require("firebase-admin/app");
+const {
+  getFirestore,
+  Timestamp,
+  FieldValue,
+  Filter,
+  serverTimestamp,
+} = require("firebase-admin/firestore");
+const serviceAccount = require("../serviceAccountKey.json");
+
+initializeApp({
+  credential: cert(serviceAccount),
+});
+
+const db = getFirestore();
+
+// async function getData(data) {
+
+// }
+
+// FirebaseのDBにデータを追加する関数
+async function insertData(userId, text) {
+  const now = new Date();
+  const year = now.getFullYear();
+  const month = (now.getMonth() + 1).toString().padStart(2, "0");
+  const day = now.getDate().toString().padStart(2, "0");
+  const hour = now.getHours().toString().padStart(2, "0");
+  const minute = now.getMinutes().toString().padStart(2, "0");
+  const second = now.getSeconds().toString().padStart(2, "0");
+  const worldTimestamp = `${year}${month}${day}${hour}${minute}${second}`; // 世界標準時のタイムスタンプ
+  const talkTimestamp = FieldValue.serverTimestamp(); // サーバー（Firestore側）のタイムスタンプ
+
+  const data = {
+    userid: userId,
+    timestamp: talkTimestamp,
+    text: text,
+  }; // FirebaseのDBに追加
+
+  const res = await db
+    .collection(userId)
+    .doc(worldTimestamp.toString())
+    .set(data);
+}
+
+module.exports = insertData;
