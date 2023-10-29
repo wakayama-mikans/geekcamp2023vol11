@@ -1,46 +1,34 @@
+require("dotenv").config();
+
 const express = require("express");
+const line = require("@line/bot-sdk");
+const PORT = process.env.EXPRESS_PORT;
+
+const config = {
+  channelSecret: process.env.LINE_CHANNEL_SECRET,
+  channelAccessToken: process.env.LINE_ACCESS_TOKEN
+};
+
 const app = express();
-const port = 80;
 
-app.get("/", (req, res) => {
-  res.send("Hello World!");
+app.post("/webhook", line.middleware(config), (req, res) => {
+  console.log(req.body.events);
+
+  Promise.all(req.body.events.map(handleEvent)).then((result) =>
+    res.json(result)
+  );
 });
 
-app.listen(port, () => {
-  console.log(`Example app listening on port ${port}`);
-});
+const client = new line.Client(config);
 
-// "use strict";
+async function handleEvent(event) {
+  if (event.type !== "message" || event.message.type !== "text") {
+    return Promise.resolve(null);
+  }
 
-// const express = require("express");
-// const line = require("@line/bot-sdk");
-// const PORT = process.env.PORT || 3000;
+  let mes = { type: "text", text: event.message.text };
+  return client.replyMessage(event.replyToken, mes);
+}
 
-// const config = {
-//   channelSecret: process.env.LINE_CHANNEL_SECRET,
-//   channelAccessToken: process.env.LINE_ACCESS_TOKEN
-// };
-
-// const app = express();
-
-// app.post("/webhook", line.middleware(config), (req, res) => {
-//   console.log(req.body.events);
-
-//   Promise.all(req.body.events.map(handleEvent)).then((result) =>
-//     res.json(result)
-//   );
-// });
-
-// const client = new line.Client(config);
-
-// async function handleEvent(event) {
-//   if (event.type !== "message" || event.message.type !== "text") {
-//     return Promise.resolve(null);
-//   }
-
-//   let mes = { type: "text", text: event.message.text };
-//   return client.replyMessage(event.replyToken, mes);
-// }
-
-// app.listen(PORT);
-// console.log(`Server running at ${PORT}`);
+app.listen(PORT);
+console.log(`Server running at ${PORT}`);
