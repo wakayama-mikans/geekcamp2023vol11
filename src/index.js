@@ -3,7 +3,7 @@ require("dotenv").config();
 const express = require("express");
 const line = require("@line/bot-sdk");
 const PORT = process.env.EXPRESS_PORT;
-const insertData = require("./database.js"); // データベース関連の関数をdatabase.jsから読み込む
+const {insertData,getData} = require("./database.js"); // データベース関連の関数をdatabase.jsから読み込む
 
 const config = {
   channelSecret: process.env.LINE_CHANNEL_SECRET,
@@ -32,6 +32,9 @@ async function handleEvent(event) {
   const text = event.message.text; // ユーザーが送信したテキスト
 
   insertData(userId,text); // database.jsのgetData関数を呼び出す
+
+  const getDataResult = await getData(userId); // database.jsのgetData関数を呼び出す
+  // let mes = { type: "text", text: getDataResult[0] };
 
   return client.replyMessage(event.replyToken, mes);
 }

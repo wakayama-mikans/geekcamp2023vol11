@@ -19,9 +19,14 @@ initializeApp({
 
 const db = getFirestore();
 
-// async function getData(data) {
-
-// }
+async function getData(userId) {
+  const res = await db.collection(userId).get(); // ユーザひとりのドキュメントすべてを取得
+  const data = res.docs.map((doc) => doc.data().text); // ドキュメントのtextフィールドのみを取得
+  //   console.log("=========================================================================");
+  //   console.log(data);
+  //   console.log("=========================================================================");
+  return data;
+}
 
 // FirebaseのDBにデータを追加する関数
 async function insertData(userId, text) {
@@ -47,4 +52,4 @@ async function insertData(userId, text) {
     .set(data);
 }
 
-module.exports = insertData;
+module.exports = { insertData, getData };
