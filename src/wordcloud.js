@@ -20,3 +20,37 @@ const wordcloud_json = [
 ];
 // これでJSON形式を宣言できているか不明．多分似た形式になってるだけで宣言できてないっぽい．
 // wordcloudにはこの形式でデータを渡す必要がある．
+
+const https = require("https");
+
+// COTOHA APIにアクセスするためのトークンを取得するための関数
+function getToken() {
+  const url = "https://api.ce-cotoha.com/v1/oauth/accesstokens";
+  const json = {
+    grantType: "client_credentials",
+    clientId: "3e849JKUbp8eDYYCUjU79DnnhrQLlBVA",
+    clientSecret: "xakNvgvjVwR0WQEl",
+  };
+  const options = {
+    method: "post",
+    headers: { "Content-type": "application/json" },
+  };
+
+  const req = https.request(url, options, (res) => {
+    let data = "";
+    res.on("data", (chunk) => {
+      data += chunk;
+    });
+
+    res.on("end", () => {
+      // リクエストが完了したらデータを処理するコードをここに書きます
+      console.log(data);
+      console.log("=============");
+    });
+  });
+
+  req.write(JSON.stringify(json));
+  req.end();
+} // ここまでは動作確認済み
+
+getToken();
