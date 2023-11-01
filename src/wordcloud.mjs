@@ -9,104 +9,24 @@ import pkg from 'save-svg-as-png';
 
 var DATA_FILE_PATH = './words.json'; // 読み込みデータファイル
 // 仮想のDOM環境を作成
-const { window } = new JSDOM();
-
+// const { window } = new JSDOM();
+const { window } = new JSDOM('<!DOCTYPE html><html><body></body></html>');
+const document = window.document;
+const body = document.body;
 registerFont('./font/NotoSansJP.ttf', { family: 'NotoSansJP' });  // font.ttfを登録する。フォント名は適当
 
 // グローバル変数の設定
-global.window = window;
-global.document = window.document;
+// global.window = window;
+// global.document = window.document;
 
-// saveSvgAsPng メソッドを取得
-const saveSvgAsPng = pkg;
-// const d3 = require('d3');
-// const cloud = require('d3-cloud');
-
-
-// const wordcloud_json = [
-//   { word: "今日", count: 3 },
-//   { word: "晴れ", count: 1 },
-//   { word: "領域", count: 1 },
-//   { word: "展開", count: 1 },
-//   { word: "怖い", count: 1 },
-//   { word: "ねむたい", count: 1 },
-//   { word: "交流", count: 2 },
-//   { word: "会", count: 2 },
-//   { word: "あり", count: 2 },
-//   { word: "開発", count: 2 },
-//   { word: "楽しい", count: 2 },
-//   { word: "寿司", count: 1 },
-//   { word: "食べ", count: 2 },
-//   { word: "ラーメン", count: 1 },
-//   { word: "花見", count: 1 },
-//   { word: "し", count: 1 },
-//   { word: "富士山", count: 1 },
-//   { word: "見て", count: 1 },
-// ];
-// // これでJSON形式を宣言できているか不明．多分似た形式になってるだけで宣言できてないっぽい．
-// // wordcloudにはこの形式でデータを渡す必要がある．
-
-// // ワードクラウドの生成
-// // SVG要素の幅と高さ
-// const width = 800;
-// const height = 400;
-
-// const canvas = createCanvas(1, 1);
-// const layout = cloud()
-//   .canvas(canvas)
-//   .size([800, 400]) // ワードクラウドの幅と高さ
-//   .words(wordcloud_json)
-//   .padding(5) // ワード間の間隔
-//   .rotate(() => 0) // ワードの回転角度
-//   .font('Impact') // 使用するフォント
-//   .fontSize(d => d.size) // ワードのサイズ
-//   .on('end', drawWordCloud(wordcloud_json));
-
-//   layout.start();
-
-//   function drawWordCloud(wordcloud_json) {
-//     const dom = new JSDOM();
-//     const document = dom.window.document;
-  
-//     // // キャンバスを生成します。
-//     // const canvas = createCanvas(layout.size()[0], layout.size()[1]);
-//     const context = canvas.getContext('2d');
-  
-//     // ワードクラウドを描画します。
-//     d3.select(document.body)
-//       .append('div')
-//       .attr('width', layout.size()[0])
-//       .attr('height', layout.size()[1])
-//       .append('svg')
-//       .attr('width', layout.size()[0])
-//       .attr('height', layout.size()[1])
-//       .append('g')
-//       .attr('transform', `translate(${layout.size()[0] / 2},${layout.size()[1] / 2})`)
-//       .selectAll('text')
-//       .data(words)
-//       .enter()
-//       .append('text')
-//       .style('font-size', d => `${d.size}px`)
-//       .style('font-family', 'Impact')
-//       .style('fill', 'black')
-//       .attr('text-anchor', 'middle')
-//       .attr('transform', d => `translate(${[d.x, d.y]}) rotate(${d.rotate})`)
-//       .text(d => d.text);
-  
-//     // キャンバスを画像ファイルとして保存します。
-//     const out = fs.createWriteStream('wordcloud.png');
-//     const stream = canvas.createPNGStream();
-//     stream.pipe(out);
-//     out.on('finish', () => console.log('Word cloud image saved.'));
-//   }
 
   // d3.json(DATA_FILE_PATH).then(function(data) { // v5
     const data = [
-      { "word": "今日", "count": 3,"color":"blue" },
+      { "word": "今日", "count": 2,"color":"#000000" },
       { "word": "晴れ", "count": 1,"color":"blue" },
       { "word": "領域", "count": 1,"color":"blue" },
       { "word": "展開", "count": 1,"color":"blue" },
-      { "word": "怖い", "count": 1,"color":"blue" },
+      { "word": "怖い", "count": 1,"color":"red" },
       { "word": "ねむたい", "count": 1,"color":"blue" },
       { "word": "交流", "count": 2,"color":"blue" },
       { "word": "会", "count": 2,"color":"blue" },
@@ -122,27 +42,6 @@ const saveSvgAsPng = pkg;
       { "word": "見て", "count": 1,"color":"blue" }
     ];
 
-    // const data = [
-    //   { "word": "今日", "count": 3 },
-    //   { "word": "晴れ", "count": 1 },
-    //   { "word": "領域", "count": 1 },
-    //   { "word": "展開", "count": 1 },
-    //   { "word": "怖い", "count": 1 },
-    //   { "word": "ねむたい", "count": 1 },
-    //   { "word": "交流", "count": 2 },
-    //   { "word": "会", "count": 2 },
-    //   { "word": "あり", "count": 2 },
-    //   { "word": "開発", "count": 2 },
-    //   { "word": "楽しい", "count": 2 },
-    //   { "word": "寿司", "count": 1 },
-    //   { "word": "食べ", "count": 2 },
-    //   { "word": "ラーメン", "count": 1 },
-    //   { "word": "花見", "count": 1 },
-    //   { "word": "し", "count": 1 },
-    //   { "word": "富士山", "count": 1 },
-    //   { "word": "見て", "count": 1 }
-    // ];
-
     var h = 490;
     var w = 600;
   
@@ -156,7 +55,12 @@ const saveSvgAsPng = pkg;
       };
     });
   
-    const canvas = createCanvas(960, 500);
+    // const canvas = createCanvas(100, 100);
+    const canvas = document.createElement('canvas');
+    body.appendChild(canvas);
+    canvas.setAttribute("id","canvasid")
+    console.log(canvas.innerHTML);
+    console.log(document.body.innerHTML);
     // cloud().size([w, h])
     //   .canvas(canvas)
     //   .words(words)
@@ -166,7 +70,7 @@ const saveSvgAsPng = pkg;
     //   .on("end", draw) //描画関数の読み込み
     //   .start();
 
-    cloud().size([960, 500])
+    cloud().size([100, 100])
       .canvas(() => canvas)
       .words(words)
       .padding(5)
@@ -174,74 +78,83 @@ const saveSvgAsPng = pkg;
       .font("Impact")
       .fontSize(d => d.size)
       // .on("end", words => console.log(JSON.stringify(words)))
-      .on("end", draw) //描画関数の読み込み
-      .start();
-
-
-            
-    // const dataURL = canvas.toDataURL();
-
-    // console.log("dataURL" + dataURL);
-    // const b64img = dataURL.split( ',' )[1];
-    // console.log(b64img);
-    // const img = base64.decode( b64img );
-    // console.log(img);
-    // fs.writeFile('sample.png', img, function (err) {
-    //   console.log("ERR:" + err);
-    // });
-    const output = fs.createWriteStream('wordcloud.png');
-  const stream = canvas.createPNGStream();
-  stream.pipe(output);
-  output.on('finish', () => {
-    console.log('WordCloud画像を保存しました。');
-  });
-
-
-    // console.log(canvas);
-    // const dataURL = canvas.toDataURL();
-
-    // console.log("dataURL" + dataURL);
-    // const b64img = dataURL.split( ',' )[1];
-    // console.log(b64img);
-    // const img = base64.decode( b64img );
-
-    // console.log(img);
-    // fs.writeFile('sample.png', img, function (err) {
-    //   console.log("ERR:" + err);
-    // });
-
-    // const dataURL = canvas.toDataURL();
-
-    // console.log("dataURL" + dataURL);
-    // const b64img = dataURL.split( ',' )[1];
-    // console.log(b64img);
-    // const img = base64.decode( b64img );
-    //     console.log(img);
-    // fs.writeFile('sample.png', img, function (err) {
-    //   console.log("ERR:" + err);
-    // });
+      // .on("end", draw(words)) //描画関数の読み込み
+      .start()
+      // .on("end", () => console.log("d3.draw!!が終わったはず"))
     
-    
-    function draw(words) {
-      console.log(words);
-      d3.select()
+      console.log("ss" + canvas.innerHTML)
+    draw(words)
+
+    function draw() {
+
+      const svg = document.createElement('svg');
+
+      d3.select(canvas)
         .append("svg")
           .attr("class", "ui fluid image") // style using semantic ui
+          .attr("xmlns",'http://www.w3.org/2000/svg')
           .attr("viewBox", "0 0 " + w + " " + h )  // ViewBox : x, y, width, height
           .attr("width", "100%")    // 表示サイズの設定
           .attr("height", "100%")   // 表示サイズの設定
         .append("g")
           .attr("transform", "translate(" + w / 2 + "," + h / 2 + ")")
         .selectAll("text")
+          // .data(words)
           .data(words)
+        .style("color", "blue")
         .enter().append("text")
+          // .style("font-size", function(d) { return 200 + "px"; })
           .style("font-size", function(d) { return d.size + "px"; })
-          .style("font-family", "NotoSansJP")
-          // .style("fill", function(d, i) { return data[i].color; })
-          .style("fill", function(d, i) { return d3.schemeCategory10[i % 10]; })
+
+          // .style("font-family", "NotoSansJP")
+          .style("fill", function(d, i) { return data[i].color; })
+          // .style("fill", function(d) { return '#ff7f0e'; })
+          // .style('fill',"#ff7f0e")
+          // .style("fill", function(d, i) { return d3.schemeCategory10[i % 10]; })
           .attr("text-anchor", "middle")
           .attr("transform", function(d) {
+            // return "translate(" + [10, 10] + ")rotate(" + 90 + ")";
             return "translate(" + [d.x, d.y] + ")rotate(" + d.rotate + ")";
           })
-          .text(function(d) { return d.text; });
+          .text(function(d) { return d.text; })
+          .on(function(d) { console.log("d3.draw!!が終わったはず"); })
+
+      console.log("ガチselect後:",canvas.innerHTML)
+
+      console.log("描写完了");
+      save();
+    }
+
+    function save(){
+      console.log('保存します');
+      // const output = fs.createWriteStream('wordcloud.png');
+      // const stream = canvas.createPNGStream();
+      // stream.pipe(output);
+      // output.on('finish', () => {
+      //   console.log('WordCloud画像を保存しました。');
+      // });
+
+      console.log(canvas.innerHTML);
+      const dataurl = canvas.toDataURL();
+      var data = dataurl.split( ',' )[1];
+      // npm i urlsafe-base64 でインストールしたモジュール。
+      // これでBase64デコードするとimgにバイナリデータが格納される。
+      var img = base64.decode( data );
+
+      // 試しにファイルをsample.jpgにして保存。Canvasではjpeg指定でBase64エンコードしている。
+      fs.writeFile('sample.svg', canvas.innerHTML, function (err) {
+          console.log(err);
+      });
+
+
+      // fs.writeFile("targetPath.jpg", svg.innerHTML, (err) => {
+      //   if(err){
+      //       console.log("エラーが発生しました。" + err);
+      //       throw err
+      //   } else {
+      //       console.log(
+      //       "を保存しました");
+      //   }
+
+    // });
     }
