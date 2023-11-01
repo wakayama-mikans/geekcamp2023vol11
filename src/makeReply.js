@@ -1,4 +1,5 @@
 const { insertData , getData } = require("./database.js"); // データベース関連の関数をdatabase.jsから読み込む
+const { otherOpinions } = require("./flexmessages/sample.js")
 
 // ユーザーごとの状態を管理するオブジェクト
 const userStates = {};
@@ -10,7 +11,8 @@ function makeReply (event) {
 
   if (text === "ジャーナルスタート！") {
     // ジャーナルの支援をリクエストした場合、状態を初期化
-    userStates[userId] = "start";
+    // userStates[userId] = "start";
+    userStates[userId] = "finish";
 
     // メッセージリストからランダムに1つを選択
     const initialMessages = ["将来は何になりたいですか？", "何かしてみたいことはありますか？"];
@@ -37,7 +39,7 @@ function makeReply (event) {
         userStates[userId] = "topic"; // statusを"topic"として設定
         console.log("topicに変更");
         break;
-    
+
       case "topic":
         // 2回目以降のやり取り
         const topicMessages = ["どうしてそう考えたの？🤔", "そのためにはどうすればいいかな？🤔"];
@@ -52,7 +54,7 @@ function makeReply (event) {
         }
         // userStates[userId].lastMessage = topicMessages[randomIndexTopic];
         break;
-    
+
       case "why":
         // 3回目のやり取り 3つの質問から使ってないものを選択
         const whyMessages = ["そのためにはどうすればいいかな？🤔", "他の選択肢はある？"];
@@ -68,7 +70,7 @@ function makeReply (event) {
           console.log("startに変更");
         }
         break;
-    
+
       case "how":
         // 3回目のやり取り 3つの質問から使ってないものを選択
         const howMessages = ["どうしてそう考えたの？", "他の選択肢はある？"];
@@ -86,12 +88,14 @@ function makeReply (event) {
         break;
     
       case "finish":
-        const finishMassages = [
-          "支援はこれにて終了です",
-          "お疲れさまでした！"
-        ]
-        mes = finishMassages.map(text => ({ type: "text", text }));
-        console.log("nullを返信");
+        // const finishMassages = [
+        //   "支援はこれにて終了です",
+        //   "お疲れさまでした！"
+        // ]
+        // mes = finishMassages.map(text => ({ type: "text", text }));
+        // console.log("nullを返信");
+        mes = { type: "flex", altText: "他の選択肢", contents: otherOpinions("お金持ちになりたい！") };
+        // mes = [otherOpinions("お金持ちになりたい！")];
         break;
     
       default:

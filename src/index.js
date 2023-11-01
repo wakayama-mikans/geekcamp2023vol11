@@ -29,7 +29,7 @@ async function handleEvent(event) {
   if (event.type !== "message" || event.message.type !== "text") {
     return Promise.resolve(null);
   }
-  
+
   // 返信用メッセージの生成
   mes = makeReply(event);
 
