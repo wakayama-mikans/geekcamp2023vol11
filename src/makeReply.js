@@ -6,7 +6,6 @@ const userStates = {};
 function makeReply (event) {
   const userId = event.source.userId; // LINEのユーザーID
   const text = event.message.text; // ユーザーが送信したテキスト
-  userStates[userId] = "finish";
   let mes;
 
   if (text === "ジャーナルの支援をしてください") {
@@ -27,7 +26,7 @@ function makeReply (event) {
     userStates[userId] = "finish";
     mes = { type: "text", text: "支援を終了しました" };
   } else {
-    insertData(userId, text); // database.jsのgetData関数を呼び出す
+    insertData(userId, userStates[userId], text); // database.jsのgetData関数を呼び出す
 
     if (userStates[userId] === "initial") {
       // 最初のやり取り
