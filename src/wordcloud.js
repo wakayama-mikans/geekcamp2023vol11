@@ -46,11 +46,46 @@ function getToken() {
       // リクエストが完了したらデータを処理するコードをここに書きます
       console.log(data);
       console.log("=============");
+      access_token = JSON.parse(data).access_token;
+      console.log(access_token);
+      test(access_token);
     });
   });
 
   req.write(JSON.stringify(json));
   req.end();
 } // ここまでは動作確認済み
+
+function test(access_token) {
+  const url = "https://api.ce-cotoha.com/api/dev/" + "nlp/v1/sentiment"; // 感情分析のエンドポイント
+  const json = {
+    sentence: "みなりかけるは天才だ！",
+    type: "default",
+  };
+  const options = {
+    method: "post",
+    headers: {
+      "Content-type": "application/json",
+      Authorization: `Bearer ${access_token}`,
+    },
+    payload: JSON.stringify(json),
+  };
+
+  const req = https.request(url, options, (res) => {
+    let data = "";
+    res.on("data", (chunk) => {
+      data += chunk;
+    });
+
+    res.on("end", () => {
+      // リクエストが完了したらデータを処理するコードをここに書きます
+      console.log(data);
+      console.log("=============");
+    });
+  });
+
+  req.write(JSON.stringify(json));
+  req.end();
+}
 
 getToken();
