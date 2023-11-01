@@ -29,7 +29,7 @@ async function getData(userId) {
 }
 
 // FirebaseのDBにデータを追加する関数
-async function insertData(userId, text) {
+async function insertData(userId, talkStatus, text) {
   const now = new Date();
   const year = now.getFullYear();
   const month = (now.getMonth() + 1).toString().padStart(2, "0");
@@ -43,6 +43,7 @@ async function insertData(userId, text) {
   const data = {
     userid: userId,
     timestamp: talkTimestamp,
+    status: talkStatus,
     text: text,
   }; // FirebaseのDBに追加
 
