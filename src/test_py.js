@@ -1,17 +1,22 @@
-// var { PythonShell } = require("python-shell");
+const axios = require("axios");
+const fastapiUrl = "http://fastapi:8888"; // FastAPIコンテナのホスト名とポート
 
-// PythonShell.run("../py/src/sample.py", null, function (err, result) {
-//   if (err) throw err;
+const fs = require("fs");
 
-//   console.log(result);
-// });
+// FastAPIにGETリクエストを送信する関数
+async function sendGetRequest() {
+  try {
+    const response = await axios.get(`${fastapiUrl}/`);
+    console.log("Response from FastAPI:");
+    console.log(response.data);
 
-const { exec } = require("child_process");
+    // const fs = require("fs");
+    // fs.writeFileSync(`./nefry.png`,response.data, "binary");
 
-exec("python ../py/src/sample.py", (error, stdout, stderr) => {
-  if (error) {
-    console.error(`エラー: ${error}`);
-    return;
+  } catch (error) {
+    console.error("Error sending GET request to FastAPI:", error.message);
   }
-  console.log(`Python スクリプトの出力: ${stdout}`);
-});
+}
+
+// GETリクエストを送信
+sendGetRequest();

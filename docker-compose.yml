@@ -32,7 +32,7 @@ services:
     networks:
       - default
 
-  # # Python
+  # Python
   # python:
   #   container_name: python
   #   build:
@@ -45,6 +45,19 @@ services:
   #   - "8888:8888"
   #   tty: true
   #   stdin_open: true
+
+  # FastAPI
+  fastapi:
+    container_name: "fastapi"
+    volumes:
+      - ./fastapi:/app
+    build:
+      context: ./
+      dockerfile: ./fastapi/Dockerfile
+    ports:
+      - 8888:8888
+    tty: true
+    stdin_open: true
 
 volumes:
   node_modules_volume:
