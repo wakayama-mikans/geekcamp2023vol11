@@ -1,3 +1,12 @@
+import * as d3 from 'd3';
+import {cloud} from 'd3-cloud';
+import {createCanvas} from 'canvas';
+
+
+// const d3 = require('d3');
+// const cloud = require('d3-cloud');
+
+
 const wordcloud_json = [
   { word: "今日", count: 3 },
   { word: "晴れ", count: 1 },
@@ -20,3 +29,19 @@ const wordcloud_json = [
 ];
 // これでJSON形式を宣言できているか不明．多分似た形式になってるだけで宣言できてないっぽい．
 // wordcloudにはこの形式でデータを渡す必要がある．
+
+// ワードクラウドの生成
+// SVG要素の幅と高さ
+const width = 800;
+const height = 400;
+
+const canvas = createCanvas(1, 1);
+const layout = cloud()
+  .canvas(canvas)
+  .size([800, 400]) // ワードクラウドの幅と高さ
+  .words(words)
+  .padding(5) // ワード間の間隔
+  .rotate(() => 0) // ワードの回転角度
+  .font('Impact') // 使用するフォント
+  .fontSize(d => d.size) // ワードのサイズ
+  .on('end', drawWordCloud(words,canvas));
