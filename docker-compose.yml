@@ -32,5 +32,17 @@ services:
     networks:
       - default
 
+  # Python
+  python:
+    container_name: python
+    build:
+      context: ./
+      dockerfile: ./py/Dockerfile
+    working_dir: /work
+    volumes:
+    - ./py:/work
+    ports:
+    - "8888:8888"
+
 volumes:
   node_modules_volume:
