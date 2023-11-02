@@ -5,14 +5,14 @@ const { promisify } = require("util");
 const writeFile = promisify(fs.writeFile);
 
 const inputData = {
-  text: "Python is a powerful programming language used for various applications. It is known for its simplicity and readability."
-  // text: "みなりかけるは天才だ！かっこいい！スマート！バレーボール馬鹿！"
+//   text: "Python is a powerful programming language used for various applications. It is known for its simplicity and readability.",
+  text: "田賀はじゃけじゃけうるさい広島人だ．広島といえばもんじゃ焼きだ．広島いきたいな．姫センはみんなでいったな．そういえばみなりん足はやかったな．みなりかけるは天才だ！かっこいい！スマート！バレーボール馬鹿！Python is a powerful programming language used for various applications. It is known for its simplicity and readability.",
 };
 
 async function test_post() {
   try {
     axios.post(`${fastapiUrl}/test`, inputData).then((response) => {
-        console.log("Processed Text:", response.data.image);
+        // console.log("Processed Text:", response.data.image);
         
         if (response.data && typeof response.data.image === "string") {
             // Base64エンコードされた文字列をデコードしてバイナリに変換
@@ -25,7 +25,7 @@ async function test_post() {
     })
     .catch((error) => {
         console.error("Error:", error);
-        console.log("エラー");
+        // console.log("エラー");
     });
     } catch (error) {
         console.error("Error sending GET request to FastAPI:", error.message);

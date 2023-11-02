@@ -7,3 +7,4 @@ matplotlib
 Image
 pydantic
 japanize-matplotlib
+numpy
