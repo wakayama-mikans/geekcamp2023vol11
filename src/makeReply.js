@@ -29,8 +29,9 @@ async function makeReply (event) {
   } else if (text === "一日の結果を見せて！") {
     userStates[userId] = "finish";
     // 1日分のワードクラウドを作成
-    const data = getTextByDate(userId, 1);
-    mes = { type: "text", text: data};
+    const data = await getTextByDate(userId, 1);
+    console.log(data)
+    mes = { type: "text", text: data[0]};
     // mes = { type: "text", text: "一日分の結果です！🥳" };
 
   } else if (text === "一週間の結果を見せて！") {
