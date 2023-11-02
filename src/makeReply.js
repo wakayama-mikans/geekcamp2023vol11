@@ -1,5 +1,6 @@
 const { insertData, getLatestTopic,getTextByDate } = require("./database.js"); // データベース関連の関数をdatabase.jsから読み込む
 const { otherOpinions } = require("./flexmessages/sample.js")
+const { getWordCloud } = require("./createWordCloud.js")
 
 // ユーザーごとの状態を管理するオブジェクト
 const userStates = {};
@@ -29,11 +30,15 @@ async function makeReply (event) {
   } else if (text === "一日の結果を見せて！") {
     userStates[userId] = "finish";
     // 1日分のワードクラウドを作成
-    const data = await getTextByDate(userId, 1);
-    console.log(data)
-    mes = { type: "text", text: data[0]};
-    // mes = { type: "text", text: "一日分の結果です！🥳" };
+    const wordCloudURL = await getWordCloud(userId, 1);
+    console.log("wordCloudURL:",wordCloudURL[0]);
+    // const sampleURL = 'https://storage.googleapis.com/geekcamp2023vol11.appspot.com/test.png?GoogleAccessId=firebase-adminsdk-wd7lg%40geekcamp2023vol11.iam.gserviceaccount.com&Expires=33166249200&Signature=EzaWC%2FXNFdUiHK5aIP6NtYmjTi1L59wU%2BqW3XUmEzIGBBCi16Qa27JPnr3Om171hFvtBN4l%2FRPmNjwLn8VmGNYctBCDmDQZCNEQIz%2BjotbPF4JC3Lk%2BGF8mtmk6Is5DCbwmCRGk0VE2xF%2BKejqQKLMzt72aeC9QXqvvGYG%2FmKCm0cuMQHLmprAe5SmuoE6Ne%2FD4Qdhn2Oo4Ec%2By54RIu0MG944QLVYKanH5tjnNZi%2Fgp38yemqQqVNUSW2mXGu00RpqPrNrweG6DX%2FwczlfWIyH9%2BLIOboip2Cuc67gzEi405C4sLFzcdSklOC2Lyy3gpLJwBk0y10CC0Py0p2vt3w%3D%3D';
 
+    mes = {
+      type: "image",
+      originalContentUrl: wordCloudURL[0],
+      previewImageUrl: wordCloudURL[0]
+    }
   } else if (text === "一週間の結果を見せて！") {
     userStates[userId] = "finish";
     // 7日分のワードクラウドを作成
