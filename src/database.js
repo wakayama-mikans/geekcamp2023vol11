@@ -51,6 +51,23 @@ async function getLatestTopic(userId) {
   }
 }
 
+//n日前の日付を取得
+async function getTextByDate(userId, date) {
+  const currentDate = new Date();
+  currentDate.setDate(currentDate.getDate() - date);
+
+  console.log(currentDate)
+  const res = await db.collection(userId)
+    .where("timestamp",">", currentDate)
+    .get();
+  
+  if (!res.empty) {
+    const data = res.docs.map((doc) => doc.data().text); // ドキュメントのtextフィールドのみを取得
+    return data;
+  } else {
+    return null;
+  }
+  }
 
 // FirebaseのDBにデータを追加する関数
 async function insertData(userId, talkStatus, text) {
@@ -77,4 +94,4 @@ async function insertData(userId, talkStatus, text) {
     .set(data);
 }
 
-module.exports = { insertData, getData, getLatestTopic };
+module.exports = { insertData, getData, getLatestTopic,getTextByDate };
