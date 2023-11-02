@@ -14,19 +14,23 @@ def create_wordcloud(text):
     fpath = "/usr/share/fonts/opentype/ipaexfont-gothic/ipaexg.ttf" # 日本語フォントのパスを指定
     mask_array = np.array(Image.open('./mask.png')) # マスク画像の読み込み
 
-    # JSON形式の単語の出現頻度データを読み込む
-    with open('./word_frequencies.json', 'r') as json_file:
-        word_frequencies = json.load(json_file)
+    word_frequencies = json.loads(text) # json形式のテキストデータを辞書型に変換
 
     # ワードクラウドを生成
-    # wordcloud = WordCloud(font_path=fpath,mask=mask_array, width=800, height=400, background_color='white').generate(text).generate_from_frequencies(word_frequencies)
-    wordcloud = WordCloud(font_path=fpath,mask=mask_array, width=800, height=400, background_color='white').generate_from_frequencies(word_frequencies)
+    wordcloud = WordCloud(font_path=fpath,
+                          mask=mask_array,
+                          contour_width=3,
+                          contour_color="steelblue",
+                          width=800,
+                          height=400,
+                          background_color='white',
+                          # colormap='tab20'
+                          ).generate_from_frequencies(word_frequencies)
 
     # プロットして表示
     plt.figure(figsize=(10, 5))
     plt.imshow(wordcloud, interpolation='bilinear')
     plt.axis("off")
-    # plt.title("WordCloud!!!") # グラフのタイトル
 
     plt.savefig("image.png")
 

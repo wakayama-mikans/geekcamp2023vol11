@@ -4,55 +4,90 @@ const fs = require("fs");
 const { promisify } = require("util");
 const writeFile = promisify(fs.writeFile);
 
-const inputData = {
-//   text: "Python is a powerful programming language used for various applications. It is known for its simplicity and readability.",
-  text: "田賀はじゃけじゃけうるさい広島人だ．広島といえばもんじゃ焼きだ．広島いきたいな．姫センはみんなでいったな．そういえばみなりん足はやかったな．みなりかけるは天才だ！かっこいい！スマート！バレーボール馬鹿！Python is a powerful programming language used for various applications. It is known for its simplicity and readability.",
-};
+const { analysisSentiment } = require("./analysissentiment.js");
+const { getTextByDate } = require("./database.js"); // データベース関連の関数をdatabase.jsから読み込む
+const { getAnalyzedWord } = require("./analysiswords.js"); // 形態素解析関連の関数をanalysiswords.jsから読み込む
 
-async function test_post() {
+async function test_post(inputData) {
   try {
-    axios.post(`${fastapiUrl}/test`, inputData).then((response) => {
-        // console.log("Processed Text:", response.data.image);
-        
+    axios
+      .post(`${fastapiUrl}/test`, inputData)
+      .then((response) => {
         if (response.data && typeof response.data.image === "string") {
-            // Base64エンコードされた文字列をデコードしてバイナリに変換
-            const binaryData = Buffer.from(response.data.image, "base64");
-            writeFile("savedImage.png", binaryData); // awaitいるかも？
-            console.log("Image saved successfully");
+          // Base64エンコードされた文字列をデコードしてバイナリに変換
+          const binaryData = Buffer.from(response.data.image, "base64");
+          writeFile("savedImage.png", binaryData); // awaitいるかも？
+          console.log("Image saved successfully");
         } else {
-            console.error("Received data is not a valid Base64 encoded string");
+          console.error("Received data is not a valid Base64 encoded string");
         }
-    })
-    .catch((error) => {
+      })
+      .catch((error) => {
         console.error("Error:", error);
-        // console.log("エラー");
-    });
-    } catch (error) {
-        console.error("Error sending GET request to FastAPI:", error.message);
-    }
+      });
+  } catch (error) {
+    console.error("Error sending GET request to FastAPI:", error.message);
+  }
 }
 
-// // FastAPIにGETリクエストを送信してBase64エンコードされた文字列を受け取り、バイナリに変換して保存
-// async function sendGetRequest() {
-//   try {
-//     const response = await axios.get(`${fastapiUrl}/`);
-//     console.log(response.data);
-//     console.log(typeof response.data.image);
+async function getSentiment(line_text) {
+  const data = await analysisSentiment(line_text) // テキストを結合して感情分析APIに送信
+    .then((response) => {
+      return response;
+    })
+    .catch((error) => {
+      console.error(error);
+    });
 
-//     if (response.data && typeof response.data.image === "string") {
-//       // Base64エンコードされた文字列をデコードしてバイナリに変換
-//       console.log("aaa");
-//       const binaryData = Buffer.from(response.data.image, "base64");
-//       await writeFile("savedImage.png", binaryData);
+  console.log("===========");
+  arr_tmp = [data.sentiment, data.score];
+  console.log(arr_tmp[0]);
+  console.log(arr_tmp[1]);
+  console.log("===========");
 
-//       console.log("Image saved successfully");
-//     } else {
-//       console.error("Received data is not a valid Base64 encoded string");
-//     }
-//   } catch (error) {
-//     console.error("Error sending GET request to FastAPI:", error.message);
-//   }
-// }
+  return arr_tmp;
+}
 
-// sendGetRequest();
-test_post();
+async function getTextByFirebase(userId) {
+  const arr_line_text = await getTextByDate(userId, 1); // Firebaseから指定期間分のテキストを取得
+  line_text = arr_line_text.join(" ");
+  console.log(line_text);
+  const arr_tmp = await getSentiment(line_text); // 感情分析APIに送信
+
+  words = await getAnalyzedWord(line_text)
+    .then((response) => {
+      return JSON.parse(response);
+    })
+    .catch((error) => {
+      console.error(error);
+    }); // YahooAPIで形態素解析
+
+  words = words.result.tokens; // 形態素解析の結果を取得
+
+  let myDictionary = {}; // 単語の辞書
+  for (var i = 0; i < words.length; i++) {
+    if (
+        words[i][3] == "名詞" ||
+        words[i][3] == "動詞" ||
+        words[i][3] == "形容詞"
+    ) {
+        // 品詞でフィルタリング
+        if (myDictionary[words[i][0]] == null) {
+        // 単語が初登場なら辞書に追加
+        myDictionary[words[i][0]] = 1;
+        } else {
+        myDictionary[words[i][0]] += 1;
+        }
+    }
+  }
+
+  const inputData = {
+    text: JSON.stringify(myDictionary),
+  };
+
+  test_post(inputData);
+}
+
+// const userId = "らいんのゆーざIDがはいる場所";
+const userId = "U20861502aebfb1e03413f01f93fb530f";
+getTextByFirebase(userId);
