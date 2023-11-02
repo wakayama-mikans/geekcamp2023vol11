@@ -1,4 +1,4 @@
-const { insertData, getLatestTopic } = require("./database.js"); // データベース関連の関数をdatabase.jsから読み込む
+const { insertData, getLatestTopic,getTextByDate } = require("./database.js"); // データベース関連の関数をdatabase.jsから読み込む
 const { otherOpinions } = require("./flexmessages/sample.js")
 
 // ユーザーごとの状態を管理するオブジェクト
@@ -29,16 +29,20 @@ async function makeReply (event) {
   } else if (text === "一日の結果を見せて！") {
     userStates[userId] = "finish";
     // 1日分のワードクラウドを作成
-    mes = { type: "text", text: "一日分の結果です！🥳" };
+    const data = getTextByDate(userId, 1);
+    mes = { type: "text", text: data};
+    // mes = { type: "text", text: "一日分の結果です！🥳" };
 
   } else if (text === "一週間の結果を見せて！") {
     userStates[userId] = "finish";
     // 7日分のワードクラウドを作成
+    getTextByDate(userId, 7);
     mes = { type: "text", text: "一週間分の結果です！🥳" };
 
   } else if (text === "一ヶ月の結果を見せて！") {
     userStates[userId] = "finish";
     // 30日分のワードクラウドを作成
+    getTextByDate(userId, 30);
     mes = { type: "text", text: "一ヶ月の結果です！🥳" };
 
   } else {
