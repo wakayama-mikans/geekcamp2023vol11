@@ -1,23 +1,9 @@
-// Firebase用の設定
 const {
-  initializeApp,
-  applicationDefault,
-  cert,
-} = require("firebase-admin/app");
-const {
-  getFirestore,
-  Timestamp,
   FieldValue,
-  Filter,
-  serverTimestamp,
 } = require("firebase-admin/firestore");
-const serviceAccount = require("../serviceAccountKey.json");
 
-initializeApp({
-  credential: cert(serviceAccount),
-});
-
-const db = getFirestore();
+// const db = getFirestore();
+  const {db} = require("./firebase-config.js");
 
 async function getData(userId) {
   const res = await db.collection(userId).get(); // ユーザひとりのドキュメントすべてを取得
