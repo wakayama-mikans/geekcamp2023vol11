@@ -8,13 +8,11 @@ import base64 from 'urlsafe-base64'
 const { window } = new JSDOM('<!DOCTYPE html><html><body></body></html>');
 const document = window.document;
 const body = document.body;
-registerFont('./font/NotoSansJP.ttf', { family: 'NotoSansJP' });  // font.ttfを登録する。フォント名は適当
-
-
+registerFont('./font/NotoSansJP.ttf', { family: 'NotoSansJP' });
 
     const data = [
       { "word": "今日", "count": 13,"color":"#000000" },
-      { "word": "晴れ", "count": 14,"color":"blue" },
+      { "word": "🥰", "count": 14,"color":"blue" },
       { "word": "領域", "count": 35,"color":"blue" },
       { "word": "展開", "count": 49,"color":"blue" },
       { "word": "怖い", "count": 35,"color":"red" },
@@ -48,7 +46,6 @@ registerFont('./font/NotoSansJP.ttf', { family: 'NotoSansJP' });  // font.ttfを
   
     const canvas = document.createElement('canvas');
     body.appendChild(canvas);
-    canvas.setAttribute("id","canvasid")
     cloud().size([w, h])
       .canvas(() => canvas)
       .words(words)
@@ -56,7 +53,6 @@ registerFont('./font/NotoSansJP.ttf', { family: 'NotoSansJP' });  // font.ttfを
       .rotate(() => Math.floor(Math.random() * 2) * 90)
       .font("Impact")
       .fontSize(d => d.size)
-      .on("end", words => console.log(JSON.stringify(words)))
       .start()
     
     draw(words)
@@ -88,7 +84,7 @@ registerFont('./font/NotoSansJP.ttf', { family: 'NotoSansJP' });  // font.ttfを
     }
 
     function save(){
-      fs.writeFile('sample.svg', canvas.innerHTML, function (err) {
+      fs.writeFile('wordcloud.svg', canvas.innerHTML, function (err) {
           console.log(err);
       });
     }
