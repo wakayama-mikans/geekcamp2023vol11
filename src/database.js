@@ -38,13 +38,12 @@ async function getLatestTopic(userId) {
   //   .orderBy("timestamp", "desc") // "timestamp" フィールドを降順でソート
   //   .limit(1) // 最新の1つだけを取得
   //   .get();
-  
-    console.log(res)
 
   if (!res.empty) {
     // ドキュメントが見つかった場合
-    const latestDoc = res.docs[0];
-    const latestText = latestDoc.data().text;
+    const reversedDocs = res.docs.slice().reverse();
+    const lastDoc = reversedDocs[0];
+    const latestText = lastDoc.data().text;
     return latestText;
   } else {
     // ドキュメントが見つからなかった場合
