@@ -16,7 +16,7 @@ function otherOpinions(inputQuestionText) {
           "contents": [
             {
               "type": "text",
-              "text": "送った質問",
+              "text": "現在のトピック",
               "color": "#ffffffa6",
               "size": "sm",
               "weight": "bold"
