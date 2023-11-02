@@ -4,31 +4,29 @@ import base64
 import japanize_matplotlib
 from PIL import Image
 import numpy as np
-
 import subprocess
-import matplotlib
+import json
+# import matplotlib
 
 # ワードクラウドを生成する関数
 def create_wordcloud(text):
 
-    # path_to_delete = matplotlib.get_cachedir()
+    fpath = "/usr/share/fonts/opentype/ipaexfont-gothic/ipaexg.ttf" # 日本語フォントのパスを指定
+    mask_array = np.array(Image.open('./mask.png')) # マスク画像の読み込み
 
-    # # コマンドを実行する
-    # result = subprocess.run(['rm', '-rf', path_to_delete], stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
-
-    # # コマンドの終了コードを取得
-    # return_code = result.returncode
+    # JSON形式の単語の出現頻度データを読み込む
+    with open('./word_frequencies.json', 'r') as json_file:
+        word_frequencies = json.load(json_file)
 
     # ワードクラウドを生成
-    fpath = "/usr/share/fonts/opentype/ipaexfont-gothic/ipaexg.ttf"
-    mask_array = np.array(Image.open('./mask.png'))
-    wordcloud = WordCloud(font_path=fpath,mask=mask_array, width=800, height=400, background_color='white').generate(text)
+    # wordcloud = WordCloud(font_path=fpath,mask=mask_array, width=800, height=400, background_color='white').generate(text).generate_from_frequencies(word_frequencies)
+    wordcloud = WordCloud(font_path=fpath,mask=mask_array, width=800, height=400, background_color='white').generate_from_frequencies(word_frequencies)
 
     # プロットして表示
     plt.figure(figsize=(10, 5))
     plt.imshow(wordcloud, interpolation='bilinear')
     plt.axis("off")
-    plt.title("WordCloud!!!")
+    # plt.title("WordCloud!!!") # グラフのタイトル
 
     plt.savefig("image.png")
 
