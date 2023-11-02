@@ -31,7 +31,7 @@ async function handleEvent(event) {
   }
 
   // 返信用メッセージの生成
-  mes = makeReply(event);
+  mes = await makeReply(event);
 
   // メッセージが空の場合は返信無し
   if (mes == null) {
