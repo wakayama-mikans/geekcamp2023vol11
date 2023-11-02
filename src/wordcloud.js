@@ -1,9 +1,19 @@
-import * as d3 from 'd3';
-import cloud from 'd3-cloud';
-import { createCanvas, loadImage, registerFont } from 'canvas';
-import fs from 'fs';
-import { JSDOM } from 'jsdom'
-import base64 from 'urlsafe-base64'
+// import * as d3 from 'd3';
+// import cloud from 'd3-cloud';
+// import { createCanvas, loadImage, registerFont } from 'canvas';
+// import fs from 'fs';
+// import { JSDOM } from 'jsdom'
+// import base64 from 'urlsafe-base64'
+
+const D3NODE = require('d3-node');
+const cloud = require('d3-cloud');
+const {registerFont} = require('canvas');
+const fs = require('fs');
+const { JSDOM } = require('jsdom');
+const base64 = require('urlsafe-base64');
+
+const d3n = new D3NODE();
+const d3 = d3n.d3;
 
 const { window } = new JSDOM('<!DOCTYPE html><html><body></body></html>');
 const document = window.document;
