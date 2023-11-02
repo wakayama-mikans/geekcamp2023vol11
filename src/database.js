@@ -28,6 +28,31 @@ async function getData(userId) {
   return data;
 }
 
+async function getLatestTopic(userId) {
+  console.log("到達！")
+  const res = await db.collection(userId)
+    .where("status", "==", "topic") // "status" フィールドが "topic" の条件を追加
+    .get();
+  // const res = await db.collection(userId)
+  //   .where("status", "==", "topic") // "status" フィールドが "topic" の条件を追加
+  //   .orderBy("timestamp", "desc") // "timestamp" フィールドを降順でソート
+  //   .limit(1) // 最新の1つだけを取得
+  //   .get();
+  
+    console.log(res)
+
+  if (!res.empty) {
+    // ドキュメントが見つかった場合
+    const latestDoc = res.docs[0];
+    const latestText = latestDoc.data().text;
+    return latestText;
+  } else {
+    // ドキュメントが見つからなかった場合
+    return null;
+  }
+}
+
+
 // FirebaseのDBにデータを追加する関数
 async function insertData(userId, talkStatus, text) {
   const now = new Date();
@@ -53,4 +78,4 @@ async function insertData(userId, talkStatus, text) {
     .set(data);
 }
 
-module.exports = { insertData, getData };
+module.exports = { insertData, getData, getLatestTopic };
