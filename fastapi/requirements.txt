@@ -5,3 +5,5 @@ starlette
 wordcloud
 matplotlib
 Image
+pydantic
+japanize-matplotlib

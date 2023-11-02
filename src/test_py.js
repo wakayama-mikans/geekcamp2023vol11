@@ -4,26 +4,55 @@ const fs = require("fs");
 const { promisify } = require("util");
 const writeFile = promisify(fs.writeFile);
 
-// FastAPIにGETリクエストを送信してBase64エンコードされた文字列を受け取り、バイナリに変換して保存
-async function sendGetRequest() {
-  try {
-    const response = await axios.get(`${fastapiUrl}/`);
-    console.log(response.data);
-    console.log(typeof response.data.image);
-    
-    if (response.data && typeof response.data.image === "string") {
-      // Base64エンコードされた文字列をデコードしてバイナリに変換
-      console.log("aaa");
-      const binaryData = Buffer.from(response.data.image, "base64");
-      await writeFile("savedImage.png", binaryData);
+const inputData = {
+  text: "Python is a powerful programming language used for various applications. It is known for its simplicity and readability."
+  // text: "みなりかけるは天才だ！かっこいい！スマート！バレーボール馬鹿！"
+};
 
-      console.log("Image saved successfully");
-    } else {
-      console.error("Received data is not a valid Base64 encoded string");
+async function test_post() {
+  try {
+    axios.post(`${fastapiUrl}/test`, inputData).then((response) => {
+        console.log("Processed Text:", response.data.image);
+        
+        if (response.data && typeof response.data.image === "string") {
+            // Base64エンコードされた文字列をデコードしてバイナリに変換
+            const binaryData = Buffer.from(response.data.image, "base64");
+            writeFile("savedImage.png", binaryData); // awaitいるかも？
+            console.log("Image saved successfully");
+        } else {
+            console.error("Received data is not a valid Base64 encoded string");
+        }
+    })
+    .catch((error) => {
+        console.error("Error:", error);
+        console.log("エラー");
+    });
+    } catch (error) {
+        console.error("Error sending GET request to FastAPI:", error.message);
     }
-  } catch (error) {
-    console.error("Error sending GET request to FastAPI:", error.message);
-  }
 }
 
-sendGetRequest();
+// // FastAPIにGETリクエストを送信してBase64エンコードされた文字列を受け取り、バイナリに変換して保存
+// async function sendGetRequest() {
+//   try {
+//     const response = await axios.get(`${fastapiUrl}/`);
+//     console.log(response.data);
+//     console.log(typeof response.data.image);
+
+//     if (response.data && typeof response.data.image === "string") {
+//       // Base64エンコードされた文字列をデコードしてバイナリに変換
+//       console.log("aaa");
+//       const binaryData = Buffer.from(response.data.image, "base64");
+//       await writeFile("savedImage.png", binaryData);
+
+//       console.log("Image saved successfully");
+//     } else {
+//       console.error("Received data is not a valid Base64 encoded string");
+//     }
+//   } catch (error) {
+//     console.error("Error sending GET request to FastAPI:", error.message);
+//   }
+// }
+
+// sendGetRequest();
+test_post();

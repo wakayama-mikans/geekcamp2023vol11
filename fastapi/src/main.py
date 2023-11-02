@@ -1,16 +1,23 @@
 from typing import Union
 from fastapi import FastAPI
-import create_wordcloud as create_wordcloud
-# import matplotlib.pyplot as plt
-# from wordcloud import WordCloud
-# import base64
+from pydantic import BaseModel
+import create_wordcloud as create_wordcloud # ワードクラウド生成のPythonファイルをインポート
+
+
+class RequestData(BaseModel):
+    text: str
 
 app = FastAPI()
 
 @app.get("/")
 def read_root():
+    return {"Hello": "World"}
 
-    base64_data = create_wordcloud.create_wordcloud() # ワードクラウドの生成
+@app.post("/test")
+async def process_text(request_data: RequestData):
+    input_text = request_data.text # node側からのデータ受取
+
+    base64_data = create_wordcloud.create_wordcloud(input_text) # ワードクラウドの生成
     return {"image": str(base64_data)}
 
 # @app.get("/items/{item_id}")
