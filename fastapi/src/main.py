@@ -1,22 +1,10 @@
 from typing import Union
 from fastapi import FastAPI
-# from fastapi.responses import FileResponse
-# from starlette.responses import FileResponse
 import matplotlib.pyplot as plt
-# from PIL import Image
-# import io
-# from starlette.middleware.cors import CORSMiddleware
+import json
 
 app = FastAPI()
 
-# # CORSを回避するために追加
-# app.add_middleware(
-#     CORSMiddleware,
-#     allow_origins=["*"],
-#     allow_credentials=True,
-#     allow_methods=["*"],
-#     allow_headers=["*"],
-# )
 
 @app.get("/")
 def read_root():
@@ -31,8 +19,13 @@ def read_root():
         image_data = f.read()
 
     print(image_data)
-    # return {"image": image_data}
-    return {"Hello": "Hello"}
+
+    # # バイナリデータを文字列に変換（バイナリデータをテキストとして扱う場合）
+    # text_data = image_data.decode('utf-8')
+    # print(text_data)
+
+    return {"image": str(image_data)}
+    # return {"Hello": "Hello"}
 
 @app.get("/items/{item_id}")
 def read_item(item_id: int, q: Union[str, None] = None):
