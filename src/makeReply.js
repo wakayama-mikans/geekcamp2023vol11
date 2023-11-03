@@ -34,9 +34,9 @@ async function makeReply(event) {
 
   } else if (text === "今日について") {
     userStates[userId] = "dailyAchievements";
-    // 一日の振り返り開始
+    // 1日の振り返り開始
     const responseMessages = [
-      "一日の振り返りを始めます！",
+      "1日の振り返りを始めます！",
       "今日、実行できたことを挙げてみよう😊"
     ];
     // ユーザーに複数のメッセージを送信
@@ -50,18 +50,38 @@ async function makeReply(event) {
     // 期間選択フレックスメッセージの送信
     mes = { type: "flex", altText: "結果を見てみよう！😎", contents: choiceSpan() };
 
-  } else if (text === "一日の結果を見せて！") {
+  } else if (text === "1日の結果を見せて！") {
+    const image = await makeWordCloudReply(userId, 1);
+    const finishMassages = [
+      "1日分の結果がこれです！",
+      "また利用してくださいね🫡"
+    ]
+    mes = finishMassages.map(text => ({ type: "text", text }));
+    mes.push(image);
     userStates[userId] = "Not supported";
-    // 1日分のワードクラウドを作成
-    mes = await makeWordCloudReply(userId, 1);
-  } else if (text === "一週間の結果を見せて！") {
-    userStates[userId] = "Not supported";
+    console.log("Not supportedに変更");
+  } else if (text === "1週間の結果を見せて！") {
     // 7日分のワードクラウドを作成
-    mes = await makeWordCloudReply(userId, 7);
-  } else if (text === "一ヶ月の結果を見せて！") {
+    const image = await makeWordCloudReply(userId, 7);
+    const finishMassages = [
+      "1週間分の結果がこれです！",
+      "また利用してくださいね🫡"
+    ]
+    mes = finishMassages.map(text => ({ type: "text", text }));
+    mes.push(image);
     userStates[userId] = "Not supported";
+    console.log("Not supportedに変更");
+  } else if (text === "1ヶ月の結果を見せて！") {
     // 30日分のワードクラウドを作成
-    mes = await makeWordCloudReply(userId, 30);
+    const image = await makeWordCloudReply(userId, 30);
+    const finishMassages = [
+      "1か月の結果がこれです！",
+      "また利用してくださいね🫡"
+    ]
+    mes = finishMassages.map(text => ({ type: "text", text }));
+    mes.push(image);
+    userStates[userId] = "Not supported";
+    console.log("Not supportedに変更");
   } else {
 
     if ((text !== "はい" && text !== "いいえ" ) && userStates[userId]){
@@ -83,10 +103,10 @@ async function makeReply(event) {
           // console.log("exceptionに変更");
           const finishMassages = [
             "お疲れ様でした！",
-            "最後に、一日の結果を見てみますか？"
+            "最後に、1日の結果を見てみますか？"
           ]
           mes = finishMassages.map(text => ({ type: "text", text }));
-          const flexmessage = { type: "flex", altText: "一日の結果を見てみる？🥺", contents: askViewResult() };
+          const flexmessage = { type: "flex", altText: "1日の結果を見てみる？🥺", contents: askViewResult() };
           mes.push(flexmessage);
           userStates[userId] = "askViewResult";
           console.log("askViewResultに変更");
@@ -198,7 +218,7 @@ async function makeReply(event) {
         } else if (text === "いいえ") {
           const nextMassages = [
             "お疲れさま！",
-            "一日の出来事についてまとめられたね",
+            "1日の出来事についてまとめられたね",
             "次は、そこから得られた気付きや学びを挙げてみよう😊"
           ]
           mes = nextMassages.map(text => ({ type: "text", text }));
@@ -235,10 +255,10 @@ async function makeReply(event) {
         } else if (text === "いいえ") {
           const finishMassages = [
             "お疲れ様でした！",
-            "最後に、一日の結果を見てみますか？"
+            "最後に、1日の結果を見てみますか？"
           ]
           mes = finishMassages.map(text => ({ type: "text", text }));
-          const flexmessage = { type: "flex", altText: "一日の結果を見てみる？🥺", contents: askViewResult() };
+          const flexmessage = { type: "flex", altText: "1日の結果を見てみる？🥺", contents: askViewResult() };
           mes.push(flexmessage);
           userStates[userId] = "askViewResult";
           console.log("askViewResultに変更");
@@ -253,7 +273,7 @@ async function makeReply(event) {
           // 1日分のワードクラウドを作成
           const image = await makeWordCloudReply(userId, 1);
           const finishMassages = [
-            "これが一日の結果です！",
+            "これが1日の結果です！",
             "以上で、サポートは終了します",
             "また利用してくださいね🫡"
           ]
@@ -273,10 +293,10 @@ async function makeReply(event) {
         }else {
           const finishMassages = [
             "お疲れ様でした！",
-            "最後に、一日の結果を見てみますか？"
+            "最後に、1日の結果を見てみますか？"
           ]
           mes = finishMassages.map(text => ({ type: "text", text }));
-          const flexmessage = { type: "flex", altText: "一日の結果を見てみる？🥺", contents: askViewResult() };
+          const flexmessage = { type: "flex", altText: "1日の結果を見てみる？🥺", contents: askViewResult() };
           mes.push(flexmessage);
           console.log("statusはaskViewResultのまま");
         }
