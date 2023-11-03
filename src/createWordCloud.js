@@ -30,7 +30,6 @@ async function getWordCloud(userId, date) {
 async function getBinaryData(inputData) {
   try {
     const response = await axios.post(`${fastApiUrl}/test`, inputData);
-    console.log(response);
     if (response.data && typeof response.data.image === "string") {
       // Base64エンコードされた文字列をデコードしてバイナリに変換
       const binaryData = Buffer.from(response.data.image, "base64");
