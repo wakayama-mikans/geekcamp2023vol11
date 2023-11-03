@@ -14,10 +14,13 @@ async function test_post(inputData) {
       .post(`${fastapiUrl}/test`, inputData)
       .then((response) => {
         if (response.data && typeof response.data.image === "string") {
-          // Base64エンコードされた文字列をデコードしてバイナリに変換
-          const binaryData = Buffer.from(response.data.image, "base64");
-          writeFile("savedImage.png", binaryData); // awaitいるかも？
-          console.log("Image saved successfully");
+            // Base64エンコードされた文字列をデコードしてバイナリに変換
+            const binaryData = Buffer.from(response.data.image, "base64");
+            writeFile("savedImage.png", binaryData); // awaitいるかも？
+            console.log("Image saved successfully");
+            //送信処理
+            console.log(binaryData)
+            return binaryData;
         } else {
           console.error("Received data is not a valid Base64 encoded string");
         }
