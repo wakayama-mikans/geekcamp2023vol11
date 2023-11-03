@@ -1,23 +1,7 @@
-// Firebase用の設定
-const {
-  initializeApp,
-  applicationDefault,
-  cert,
-} = require("firebase-admin/app");
-const {
-  getFirestore,
-  Timestamp,
-  FieldValue,
-  Filter,
-  serverTimestamp,
-} = require("firebase-admin/firestore");
-const serviceAccount = require("../serviceAccountKey.json");
+const { FieldValue } = require("firebase-admin/firestore");
 
-initializeApp({
-  credential: cert(serviceAccount),
-});
-
-const db = getFirestore();
+// const db = getFirestore();
+const { db } = require("./firebase-config.js");
 
 async function getData(userId) {
   const res = await db.collection(userId).get(); // ユーザひとりのドキュメントすべてを取得
@@ -29,8 +13,9 @@ async function getData(userId) {
 }
 
 async function getLatestTopic(userId) {
-  console.log("到達！")
-  const res = await db.collection(userId)
+  console.log("到達！");
+  const res = await db
+    .collection(userId)
     .where("status", "==", "topic") // "status" フィールドが "topic" の条件を追加
     .get();
   // const res = await db.collection(userId)
@@ -56,18 +41,19 @@ async function getTextByDate(userId, date) {
   const currentDate = new Date();
   currentDate.setDate(currentDate.getDate() - date);
 
-  console.log(currentDate)
-  const res = await db.collection(userId)
-    .where("timestamp",">", currentDate)
+  console.log(currentDate);
+  const res = await db
+    .collection(userId)
+    .where("timestamp", ">", currentDate)
     .get();
-  
+
   if (!res.empty) {
     const data = res.docs.map((doc) => doc.data().text); // ドキュメントのtextフィールドのみを取得
     return data;
   } else {
     return null;
   }
-  }
+}
 
 // FirebaseのDBにデータを追加する関数
 async function insertData(userId, talkStatus, text) {
@@ -94,4 +80,4 @@ async function insertData(userId, talkStatus, text) {
     .set(data);
 }
 
-module.exports = { insertData, getData, getLatestTopic,getTextByDate };
+module.exports = { insertData, getData, getLatestTopic, getTextByDate };

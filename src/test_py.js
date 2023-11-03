@@ -19,6 +19,9 @@ async function test_post() {
             const binaryData = Buffer.from(response.data.image, "base64");
             writeFile("savedImage.png", binaryData); // awaitいるかも？
             console.log("Image saved successfully");
+            //送信処理
+            console.log(binaryData)
+            return binaryData;
         } else {
             console.error("Received data is not a valid Base64 encoded string");
         }
@@ -55,4 +58,4 @@ async function test_post() {
 // }
 
 // sendGetRequest();
-test_post();
+test_post()
