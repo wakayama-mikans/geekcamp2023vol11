@@ -1,12 +1,9 @@
 from wordcloud import WordCloud
-# import matplotlib.pyplot as plt
 import base64
-# import japanize_matplotlib
 from PIL import Image
 import numpy as np
 import subprocess
 import json
-# import matplotlib
 import io
 
 # ワードクラウドを生成する関数
@@ -20,8 +17,14 @@ def create_wordcloud(inputData):
 
     # 感情分析の結果によってワードクラウドの色を変える
     if sentiment == "Positive":
-        if(score > 0.5):
+        if(score > 0.6):
             sentiment_color = "autumn"
+        elif(score > 0.5):
+            sentiment_color = "Spectral_r"
+        elif(score > 0.4):
+            sentiment_color = "Set2"
+        elif(score > 0.3):
+            sentiment_color = "PiYG_r"
         else:
             sentiment_color = "spring"
     elif sentiment == "Negative":
