@@ -1,6 +1,6 @@
 const { insertData, getLatestTopic,getTextByDate } = require("./database.js"); // データベース関連の関数をdatabase.jsから読み込む
 const { otherOpinions } = require("./flexmessages/otherOpinions.js")
-const { askToContinue } = require("./flexmessages/userInteraction.js")
+const { askToContinue, askViewResult } = require("./flexmessages/userInteraction.js")
 const { choiceSpan } = require("./flexmessages/viewWordcloud.js")
 const { getWordCloud } = require("./createWordCloud.js")
 const { howToUseing } = require("./flexmessages/howToUse.js")
@@ -53,15 +53,15 @@ async function makeReply(event) {
   } else if (text === "一日の結果を見せて！") {
     userStates[userId] = "finish";
     // 1日分のワードクラウドを作成
-    mes = makeWordCloudReply(userId, 1);
+    mes = await makeWordCloudReply(userId, 1);
   } else if (text === "一週間の結果を見せて！") {
     userStates[userId] = "finish";
     // 7日分のワードクラウドを作成
-    mes = makeWordCloudReply(userId, 7);
+    mes = await makeWordCloudReply(userId, 7);
   } else if (text === "一ヶ月の結果を見せて！") {
     userStates[userId] = "finish";
     // 30日分のワードクラウドを作成
-    mes = makeWordCloudReply(userId, 30);
+    mes = await makeWordCloudReply(userId, 30);
   } else {
 
     if ((text !== "はい" && text !== "いいえ" ) && userStates[userId]){
@@ -226,18 +226,47 @@ async function makeReply(event) {
         } else if (text === "いいえ") {
           const finishMassages = [
             "お疲れ様でした！",
-            "サポートはこれにて終了です",
-            "また利用してくださいね🫡"
+            "最後に、一日の結果を見てみますか？"
           ]
           mes = finishMassages.map(text => ({ type: "text", text }));
-          userStates[userId] = "Not supported";
-          console.log("Not supportedに変更");
+          const flexmessage = { type: "flex", altText: "一日の結果を見てみる？🥺", contents: askViewResult() };
+          mes.push(flexmessage);
+          userStates[userId] = "askViewResult";
+          console.log("askViewResultに変更");
         }else {
           mes = { type: "flex", altText: "他にもありそう？🤔", contents: askToContinue() };
           console.log("statusはdailyFutureのまま");
         }
         break;
-    
+
+      case "askViewResult":
+        if (text === "はい") {
+          // 1日分のワードクラウドを作成
+          const image = await makeWordCloudReply(userId, 1);
+          const finishMassages = [
+            "これが一日の結果です！",
+            "以上で、サポートは終了します",
+            "また利用してくださいね🫡"
+          ]
+          mes = finishMassages.map(text => ({ type: "text", text }));
+          mes.push(image);
+        } else if (text === "いいえ") {
+          const finishMassages = [
+            "了解しました！",
+            "それでは、サポートはこれにて終了です",
+            "また利用してくださいね🫡"
+          ]
+          mes = finishMassages.map(text => ({ type: "text", text }));
+          userStates[userId] = "askViewResult";
+          console.log("askViewResultに変更");
+        }else {
+          mes = { type: "flex", altText: "他にもありそう？🤔", contents: askToContinue() };
+          console.log("statusはaskViewResultのまま");
+        }
+        userStates[userId] = "Not supported";
+        console.log("Not supportedに変更");
+        break;
+
       case "finish":
         const finishMassages = [
           "お疲れ様でした！",
@@ -245,6 +274,8 @@ async function makeReply(event) {
           "また利用してくださいね🫡"
         ]
         mes = finishMassages.map(text => ({ type: "text", text }));
+        // addMessage = { type: "flex", altText: "他にもありそう？🤔", contents: askToContinue() };
+        // mes.push(addMessage);
         // const latestTopic = await getLatestTopic(userId);
         // console.log(latestTopic);
         // mes = { type: "flex", altText: "他の選択肢について考えてみよう！😎", contents: otherOpinions(latestTopic) };
