@@ -15,13 +15,13 @@ ENV TERM xterm
 RUN apt-get install -y vim less
 RUN apt install -y fonts-ipaexfont
 
-COPY ./fastapi/requirements.txt .
+COPY ./requirements.txt .
 RUN pip install --no-cache-dir --upgrade -r requirements.txt
 
 # 日本語フォントのインストール
 # RUN apt-get update && apt-get install -y fonts-ipafont
 # RUN fc-cache -f -v
 
-COPY ./fastapi/src/ .
+COPY ./src/ .
 
 CMD ["uvicorn", "main:app", "--reload", "--host", "0.0.0.0", "--port", "8888"]
