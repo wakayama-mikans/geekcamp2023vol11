@@ -16,15 +16,22 @@ def create_wordcloud(inputData):
 
     word_frequencies = json.loads(inputData.text) # json形式のテキストデータを辞書型に変換
     sentiment = inputData.sentiment # 感情分析の結果
+    score = inputData.score # 感情分析の結果
 
     # 感情分析の結果によってワードクラウドの色を変える
     if sentiment == "Positive":
-        sentiment_color = "autumn"
+        if(score > 0.5):
+            sentiment_color = "autumn"
+        else:
+            sentiment_color = "spring"
     elif sentiment == "Negative":
-        sentiment_color = "cool"
+        if(score > 0.5):
+            sentiment_color = "winter"
+        else:
+            sentiment_color = "cool"
     else:
         sentiment_color = "summer"
-    print(sentiment_color)
+    # print(sentiment_color)
 
     # ワードクラウドを生成
     wordcloud = WordCloud(font_path=fpath,

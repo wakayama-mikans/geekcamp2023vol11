@@ -8,6 +8,7 @@ import create_wordcloud as create_wordcloud # ワードクラウド生成のPyth
 class RequestData(BaseModel):
     text: str
     sentiment: str
+    score: float
 
 app = FastAPI()
 
