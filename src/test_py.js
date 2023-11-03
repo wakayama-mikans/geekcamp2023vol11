@@ -39,11 +39,14 @@ async function getSentiment(line_text) {
       console.error(error);
     });
 
-  console.log("===========");
-  arr_tmp = [data.sentiment, data.score];
-  console.log(arr_tmp[0]);
-  console.log(arr_tmp[1]);
-  console.log("===========");
+  //   console.log("===========");
+  //   arr_tmp = [data.sentiment, data.score];
+  //   console.log(arr_tmp[0]);
+  //   console.log(arr_tmp[1]);
+  //   console.log("===========");
+
+  arr_tmp = data.sentiment; // ポジティブ，ネガティブ，ニュートラルのいずれか
+//   console.log(arr_tmp);
 
   return arr_tmp;
 }
@@ -51,7 +54,7 @@ async function getSentiment(line_text) {
 async function getTextByFirebase(userId) {
   const arr_line_text = await getTextByDate(userId, 1); // Firebaseから指定期間分のテキストを取得
   line_text = arr_line_text.join(" ");
-  console.log(line_text);
+  // console.log(line_text);
   const arr_tmp = await getSentiment(line_text); // 感情分析APIに送信
 
   words = await getAnalyzedWord(line_text)
@@ -67,27 +70,29 @@ async function getTextByFirebase(userId) {
   let myDictionary = {}; // 単語の辞書
   for (var i = 0; i < words.length; i++) {
     if (
-        words[i][3] == "名詞" ||
-        words[i][3] == "動詞" ||
-        words[i][3] == "形容詞"
+      words[i][3] == "名詞" ||
+      words[i][3] == "動詞" ||
+      words[i][3] == "形容詞"
     ) {
-        // 品詞でフィルタリング
-        if (myDictionary[words[i][0]] == null) {
+      // 品詞でフィルタリング
+      if (myDictionary[words[i][0]] == null) {
         // 単語が初登場なら辞書に追加
         myDictionary[words[i][0]] = 1;
-        } else {
+      } else {
         myDictionary[words[i][0]] += 1;
-        }
+      }
     }
   }
 
   const inputData = {
     text: JSON.stringify(myDictionary),
+    sentiment: arr_tmp,
   };
 
+  // console.log(inputData);
   test_post(inputData);
 }
 
-// const userId = "らいんのゆーざIDがはいる場所";
-const userId = "U20861502aebfb1e03413f01f93fb530f";
+const userId = "LINE_USER_ID"
+
 getTextByFirebase(userId);
