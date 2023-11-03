@@ -5,9 +5,9 @@ const { getTextByDate } = require("./database.js");
 const { analysisSentiment } = require("./analysissentiment.js"); // 感情分析API
 const { getAnalyzedWord } = require("./analysiswords.js"); // 形態素解析API
 
-// const fs = require("fs");
-// const { promisify } = require("util");
-// const writeFile = promisify(fs.writeFile);
+const fs = require("fs");
+const { promisify } = require("util");
+const writeFile = promisify(fs.writeFile);
 
 async function getWordCloud(userId, date) {
   //TODO:WordCloud生成の引数設定：listから文字列変換（頻度分析・感情分析・形態素解析）をどうやるかによって分かれそう
@@ -52,7 +52,8 @@ async function getWordCloud(userId, date) {
   // FastAPIに送信するデータ
   const inputData = {
     text: JSON.stringify(myDictionary),
-    sentiment: arr_tmp,
+    sentiment: arr_tmp[0],
+    score: arr_tmp[1],
   };
 
   //バイナリデータをPNG変換してFirebaseStorageに保存
@@ -101,8 +102,11 @@ async function getSentiment(line_text) {
     });
 
   arr_tmp = data.sentiment; // ポジティブ，ネガティブ，ニュートラルのいずれか
+  console.log(arr_tmp);
+  score = data.score;
+  console.log(score);
 
-  return arr_tmp;
+  return [arr_tmp, score];
 }
 
 module.exports = { getWordCloud };
