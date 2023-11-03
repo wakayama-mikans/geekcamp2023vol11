@@ -13,6 +13,7 @@ async function getWordCloud(userId, date) {
 
   //バイナリデータをPNG変換してFirebaseStorageに保存
   const binaryData = await getBinaryData(sampleInput);
+  //TODO:画像の保存保存場所の検討 現状はUserID.pngを更新し続けている（A：ランダム生成，B：作成後に削除，C：ファイル更新（<-現状これ)
   const fileName = userId + ".png";
   const file = bucket.file(fileName); // アップロードするファイルの名前を指定
   await file.save(binaryData, {
