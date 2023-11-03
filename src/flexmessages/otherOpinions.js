@@ -1,7 +1,5 @@
-/**
- * Generate a FlexMessage to confirm whether to send a rewritten question text
- * @param inputQuestionText - The question text to be sent
- */
+
+
 function otherOpinions(inputQuestionText) {
   return {
     "type": "bubble",
@@ -18,8 +16,7 @@ function otherOpinions(inputQuestionText) {
               "type": "text",
               "text": "現在のトピック",
               "color": "#ffffffa6",
-              "size": "sm",
-              "weight": "bold"
+              "size": "sm"
             },
             {
               "type": "text",
@@ -48,20 +45,19 @@ function otherOpinions(inputQuestionText) {
           "contents": [
             {
               "type": "text",
-              "text": "他の選択肢はありますか？",
+              "text": "他の選択肢はありますか？😎",
               "gravity": "center",
               "flex": 4,
-              "size": "md",
-              "margin": "none"
+              "size": "md"
             }
           ],
           "spacing": "xs",
           "cornerRadius": "30px",
-          "margin": "xl"
+          "margin": "lg"
         },
         {
           "type": "box",
-          "layout": "vertical",
+          "layout": "horizontal",
           "contents": [
             {
               "type": "button",
@@ -80,7 +76,7 @@ function otherOpinions(inputQuestionText) {
               }
             }
           ],
-          "margin": "xl"
+          "margin": "lg"
         }
       ]
     }

@@ -1,5 +1,7 @@
 const { insertData, getLatestTopic,getTextByDate } = require("./database.js"); // データベース関連の関数をdatabase.jsから読み込む
-const { otherOpinions } = require("./flexmessages/sample.js")
+const { otherOpinions } = require("./flexmessages/otherOpinions.js")
+const { askToContinue } = require("./flexmessages/userInteraction.js")
+const { choiceSpan } = require("./flexmessages/viewWordcloud.js")
 
 // ユーザーごとの状態を管理するオブジェクト
 const userStates = {};
@@ -12,7 +14,6 @@ async function makeReply (event) {
   if (text === "ジャーナルスタート！") {
     // ジャーナルの支援をリクエストした場合、状態を初期化
     userStates[userId] = "start";
-
     // デバッグ用
     // userStates[userId] = "finish";
 
@@ -25,6 +26,20 @@ async function makeReply (event) {
     ];
     // ユーザーに複数のメッセージを送信
     mes = responseMessages.map(text => ({ type: "text", text }));
+
+  } else if (text === "一日の振り返りがしたい") {
+    userStates[userId] = "dailyAchievements";
+    // 一日の振り返り開始
+    const responseMessages = [
+      "一日の振り返りを始めます！",
+      "今日、実行できたことを挙げてみよう😊"
+    ];
+    // ユーザーに複数のメッセージを送信
+    mes = responseMessages.map(text => ({ type: "text", text }));
+
+  } else if (text === "結果がみたい") {
+    // 期間選択フレックスメッセージの送信
+    mes = { type: "flex", altText: "結果を見てみよう！😎", contents: choiceSpan() };
 
   } else if (text === "一日の結果を見せて！") {
     userStates[userId] = "finish";
@@ -126,11 +141,86 @@ async function makeReply (event) {
           console.log("startに変更");
         }
         break;
+
+      case "dailyAchievements":
+        if (text === "はい") {
+          mes = { type: "text", text: "じゃあ、他にできたことを教えて！🙂" };
+          console.log("statusはdailyAchievementsのまま");
+        } else if (text === "いいえ") {
+          const nextMassages = [
+            "よく頑張ったね！",
+            "じゃあ次は、今日できなかったことについて教えて！🤔"
+          ]
+          mes = nextMassages.map(text => ({ type: "text", text }));
+          userStates[userId] = "dailyRegrets";
+          console.log("dailyRegretsに変更");
+        }else {
+          mes = { type: "flex", altText: "他にもありそう？🤔", contents: askToContinue() };
+          console.log("statusはdailyAchievementsのまま");
+        }
+        break;
+
+      case "dailyRegrets":
+        if (text === "はい") {
+          mes = { type: "text", text: "じゃあ、他にできなかったことを教えて！😗" };
+          console.log("statusはdailyRegretsのまま");
+        } else if (text === "いいえ") {
+          const nextMassages = [
+            "お疲れさま！",
+            "一日の出来事についてまとめられたね",
+            "次は、そこから得られた気付きや学びを挙げてみよう😊"
+          ]
+          mes = nextMassages.map(text => ({ type: "text", text }));
+          userStates[userId] = "dailyNotice";
+          console.log("dailyNoticeに変更");
+        }else {
+          mes = { type: "flex", altText: "他にもありそう？🤔", contents: askToContinue() };
+          console.log("statusはdailyRegretsのまま");
+        }
+        break;
+
+      case "dailyNotice":
+        if (text === "はい") {
+          mes = { type: "text", text: "じゃあ、他に気付いたことを教えて！🙂" };
+          console.log("statusはdailyNoticeのまま");
+        } else if (text === "いいえ") {
+          const nextMassages = [
+            "なるほどなるほど...",
+            "じゃあ最後に、それらを踏まえてこれからしたいことも書いてみよう😉"
+          ]
+          mes = nextMassages.map(text => ({ type: "text", text }));
+          userStates[userId] = "dailyFuture";
+          console.log("dailyFutureに変更");
+        }else {
+          mes = { type: "flex", altText: "他にもありそう？🤔", contents: askToContinue() };
+          console.log("statusはdailyNoticeのまま");
+        }
+        break;
+
+      case "dailyFuture":
+        if (text === "はい") {
+          mes = { type: "text", text: "じゃあ、他にやりたいことを教えて！😗" };
+          console.log("statusはdailyFutureのまま");
+        } else if (text === "いいえ") {
+          const finishMassages = [
+            "お疲れ様でした！",
+            "サポートはこれにて終了です",
+            "また利用してくださいね🫡"
+          ]
+          mes = finishMassages.map(text => ({ type: "text", text }));
+          userStates[userId] = "Not supported";
+          console.log("Not supportedに変更");
+        }else {
+          mes = { type: "flex", altText: "他にもありそう？🤔", contents: askToContinue() };
+          console.log("statusはdailyFutureのまま");
+        }
+        break;
     
       case "finish":
         const finishMassages = [
+          "お疲れ様でした！",
           "サポートはこれにて終了です",
-          "お疲れさまでした！🫠"
+          "また利用してくださいね🫡"
         ]
         mes = finishMassages.map(text => ({ type: "text", text }));
         // const latestTopic = await getLatestTopic(userId);
