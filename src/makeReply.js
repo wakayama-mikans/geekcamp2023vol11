@@ -63,7 +63,7 @@ async function makeReply (event) {
 
   } else {
 
-    if (text !== "はい" && text !== "いいえ") {
+    if ((text !== "はい" && text !== "いいえ" ) && userStates[userId]){
       // id, status, textをDBに格納
       insertData(userId, userStates[userId], text);
     }
@@ -232,6 +232,7 @@ async function makeReply (event) {
       default:
         mes = null;
         userStates[userId] = "Not supported"
+        insertData(userId, userStates[userId], text);
     }
   }
 
