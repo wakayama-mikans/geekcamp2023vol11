@@ -70,7 +70,7 @@ function askViewResult() {
           "contents": [
             {
               "type": "text",
-              "text": "一日の結果を見てみる？🤔",
+              "text": "1日の結果を見てみる？🤔",
               "color": "#ffffff",
               "size": "lg",
               "flex": 4,
