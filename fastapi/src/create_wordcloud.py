@@ -1,12 +1,13 @@
 from wordcloud import WordCloud
 import matplotlib.pyplot as plt 
 import base64
-import japanize_matplotlib
+# import japanize_matplotlib
 from PIL import Image
 import numpy as np
 import subprocess
 import json
 # import matplotlib
+import io
 
 # ワードクラウドを生成する関数
 def create_wordcloud(inputData):
@@ -41,11 +42,10 @@ def create_wordcloud(inputData):
     plt.imshow(wordcloud, interpolation='bilinear')
     plt.axis("off")
 
-    plt.savefig("image.png")
-
-    # 画像をバイナリデータとして読み込む
-    with open("./image.png", "rb") as f:
-        image_data = f.read()
-        base64_data = base64.b64encode(image_data).decode('utf-8')
+    buffer = io.BytesIO()
+    plt.savefig(buffer, format='png')
+    buffer.seek(0)
+    image_data = buffer.read()
+    base64_data = base64.b64encode(image_data).decode('utf-8')
 
     return base64_data
