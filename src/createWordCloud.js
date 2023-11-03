@@ -12,6 +12,12 @@ const { getAnalyzedWord } = require("./analysiswords.js"); // 形態素解析API
 async function getWordCloud(userId, date) {
   //TODO:WordCloud生成の引数設定：listから文字列変換（頻度分析・感情分析・形態素解析）をどうやるかによって分かれそう
   const targetTextData = await getTextByDate(userId, date);
+  // console.log(targetTextData);
+  // console.log(targetTextData.length);
+  const len_text = targetTextData.length; // 取得したテキストの数
+  if (len_text == 0) {
+    return {err: "NoText"}
+  }
   const line_text = targetTextData.join(" "); // 取得したテキストを1文章に結合
   const arr_tmp = await getSentiment(line_text); // 感情分析APIに送信
 
@@ -63,7 +69,7 @@ async function getWordCloud(userId, date) {
     expires: "12-31-3020", //1000年後に設定
   });
 
-  return url;
+  return {result: {url}};
 }
 
 async function getBinaryData(inputData) {

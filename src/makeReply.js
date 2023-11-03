@@ -259,12 +259,20 @@ async function makeReply(event) {
 
 async function makeWordCloudReply(userId, date) {
   //TODO:画像生成失敗した時のERRメッセージ
-  const wordCloudURL = await getWordCloud(userId, date);
-  mes = {
-    type: "image",
-    originalContentUrl: wordCloudURL[0],
-    previewImageUrl: wordCloudURL[0],
-  };
+  //TODO:画像生成するためのメッセージが足りない
+  const res = await getWordCloud(userId, date);
+  if("result" in res){
+    const wordCloudURL = res.result.url
+    mes = {
+      type: "image",
+      originalContentUrl: wordCloudURL[0],
+      previewImageUrl: wordCloudURL[0],
+    };
+  }else{
+    //TODO:ERRメッセージ
+    //TODO:0の時，n個以下のとき？
+    mes = { type: "text", text: "もっとジャーナリングしてみよう" }
+  }
   return mes;
 }
 
