@@ -1,0 +1,10 @@
+# 必要なライブラリをインポート
+fastapi
+uvicorn
+starlette
+wordcloud
+matplotlib
+Image
+pydantic
+japanize-matplotlib
+numpy
