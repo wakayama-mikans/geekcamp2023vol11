@@ -2,7 +2,7 @@ const https = require("https");
 require("dotenv").config(); // envファイル読み込み
 
 // COTOHA APIにアクセスするためのトークンを取得するための関数
-function getToken() {
+async function getToken() {
   return new Promise((resolve, reject) => {
     const url = "https://api.ce-cotoha.com/v1/oauth/accesstokens";
     const json = {
@@ -40,8 +40,8 @@ function getToken() {
   });
 }
 
-function analysisSentiment(text) {
-  getToken("your_text_here")
+async function analysisSentiment(text) {
+  return await getToken()
     .then((access_token) => {
       // console.log(access_token);
       return new Promise((resolve, reject) => {
@@ -66,10 +66,11 @@ function analysisSentiment(text) {
           });
 
           res.on("end", () => {
-            console.log(data);
-            sentiment = JSON.parse(data).result.sentiment;
-            score = JSON.parse(data).result.score;
-            console.log([sentiment, score]);
+            try {
+              resolve(JSON.parse(data).result);
+            } catch (error) {
+              reject(error);
+            }
           });
         });
 
