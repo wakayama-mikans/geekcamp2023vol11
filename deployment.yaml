@@ -1,0 +1,125 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    kompose.cmd: kompose convert -f docker-compose.yml
+    kompose.version: 1.31.2 (a92241f79)
+  creationTimestamp: null
+  labels:
+    io.kompose.service: node
+  name: node
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      io.kompose.service: node
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      annotations:
+        kompose.cmd: kompose convert -f docker-compose.yml
+        kompose.version: 1.31.2 (a92241f79)
+      creationTimestamp: null
+      labels:
+        io.kompose.network/geekcamp2023vol11-default: "true"
+        io.kompose.service: node
+    spec:
+      containers:
+        - env:
+            - name: TZ
+              value: Asia/Tokyo
+          image: node
+          name: node
+          ports:
+            - containerPort: 80
+          resources: {}
+          tty: true
+          volumeMounts:
+            - mountPath: /app
+              name: node-claim0
+            - mountPath: /app/node_modules
+              name: node-modules-volume
+      restartPolicy: Always
+      volumes:
+        - name: node-claim0
+          persistentVolumeClaim:
+            claimName: node-claim0
+        - name: node-modules-volume
+          persistentVolumeClaim:
+            claimName: node-modules-volume
+status: {}
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    kompose.cmd: kompose convert -f docker-compose.yml
+    kompose.version: 1.31.2 (a92241f79)
+  creationTimestamp: null
+  labels:
+    io.kompose.service: fastapi
+  name: fastapi
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      io.kompose.service: fastapi
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      annotations:
+        kompose.cmd: kompose convert -f docker-compose.yml
+        kompose.version: 1.31.2 (a92241f79)
+      creationTimestamp: null
+      labels:
+        io.kompose.network/geekcamp2023vol11-default: "true"
+        io.kompose.service: fastapi
+    spec:
+      containers:
+        - image: fastapi
+          name: fastapi
+          ports:
+            - containerPort: 8888
+          resources: {}
+          stdin: true
+          tty: true
+          volumeMounts:
+            - mountPath: /app
+              name: fastapi-claim0
+      restartPolicy: Always
+      volumes:
+        - name: fastapi-claim0
+          persistentVolumeClaim:
+            claimName: fastapi-claim0
+status: {}
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: service1
+spec:
+  selector:
+    app: myapp
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 8080
+  type: LoadBalancer
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: service2
+spec:
+  selector:
+    app: myapp
+  ports:
+    - protocol: TCP
+      port: 81
+      targetPort: 8888
+  type: LoadBalancer
