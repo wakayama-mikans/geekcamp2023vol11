@@ -30,7 +30,7 @@ function otherOpinions(inputQuestionText) {
         }
       ],
       "paddingAll": "20px",
-      "backgroundColor": "#f4a460",
+      "backgroundColor": "#f3a074",
       "spacing": "md",
       "height": "100px",
       "paddingTop": "22px"
