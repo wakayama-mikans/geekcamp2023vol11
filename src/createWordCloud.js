@@ -101,6 +101,9 @@ async function getSentiment(line_text) {
     });
 
   arr_tmp = data.sentiment; // ポジティブ，ネガティブ，ニュートラルのいずれか
+  console.log(arr_tmp);
+  score = data.score;
+  console.log(score);
 
   return arr_tmp;
 }

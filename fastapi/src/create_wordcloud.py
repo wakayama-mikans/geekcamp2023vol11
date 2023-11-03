@@ -1,5 +1,5 @@
 from wordcloud import WordCloud
-import matplotlib.pyplot as plt 
+# import matplotlib.pyplot as plt
 import base64
 # import japanize_matplotlib
 from PIL import Image
@@ -30,20 +30,18 @@ def create_wordcloud(inputData):
     wordcloud = WordCloud(font_path=fpath,
                           mask=mask_array,
                           contour_width=3,
-                          contour_color="pink",#"steelblue",
+                          contour_color="pink",
                           width=800,
-                          height=400,
+                          height=800,
                           background_color='white',
                           colormap=sentiment_color
                           ).generate_from_frequencies(word_frequencies)
 
-    # プロットして表示
-    plt.figure(figsize=(10, 5))
-    plt.imshow(wordcloud, interpolation='bilinear')
-    plt.axis("off")
+    # 画像をPillowのImageオブジェクトに変換
+    wordcloud_image = wordcloud.to_image()
 
     buffer = io.BytesIO()
-    plt.savefig(buffer, format='png')
+    wordcloud_image.save(buffer, format='PNG')
     buffer.seek(0)
     image_data = buffer.read()
     base64_data = base64.b64encode(image_data).decode('utf-8')
