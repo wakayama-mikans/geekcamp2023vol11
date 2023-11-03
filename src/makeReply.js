@@ -3,6 +3,7 @@ const { otherOpinions } = require("./flexmessages/otherOpinions.js")
 const { askToContinue } = require("./flexmessages/userInteraction.js")
 const { choiceSpan } = require("./flexmessages/viewWordcloud.js")
 const { getWordCloud } = require("./createWordCloud.js")
+const { howToUseing } = require("./flexmessages/howToUse.js")
 
 // ユーザーごとの状態を管理するオブジェクト
 const userStates = {};
@@ -40,6 +41,10 @@ async function makeReply(event) {
     ];
     // ユーザーに複数のメッセージを送信
     mes = responseMessages.map(text => ({ type: "text", text }));
+
+  } else if (text === "使い方を教えて！") {
+    // 期間選択フレックスメッセージの送信
+    mes = { type: "flex", altText: "使い方はこちら！🙂", contents: howToUseing() };
 
   } else if (text === "結果がみたい") {
     // 期間選択フレックスメッセージの送信
