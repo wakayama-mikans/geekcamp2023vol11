@@ -51,15 +51,15 @@ async function makeReply(event) {
     mes = { type: "flex", altText: "結果を見てみよう！😎", contents: choiceSpan() };
 
   } else if (text === "一日の結果を見せて！") {
-    userStates[userId] = "finish";
+    userStates[userId] = "Not supported";
     // 1日分のワードクラウドを作成
     mes = await makeWordCloudReply(userId, 1);
   } else if (text === "一週間の結果を見せて！") {
-    userStates[userId] = "finish";
+    userStates[userId] = "Not supported";
     // 7日分のワードクラウドを作成
     mes = await makeWordCloudReply(userId, 7);
   } else if (text === "一ヶ月の結果を見せて！") {
-    userStates[userId] = "finish";
+    userStates[userId] = "Not supported";
     // 30日分のワードクラウドを作成
     mes = await makeWordCloudReply(userId, 30);
   } else {
@@ -74,13 +74,22 @@ async function makeReply(event) {
       case "start":
         // 最初のやり取り
         if (text === "いいえ") {
+          // const finishMassages = [
+          //   "サポートはこれにて終了です！",
+          //   "お疲れさまでした！🫠",
+          // ];
+          // mes = finishMassages.map((text) => ({ type: "text", text }));
+          // userStates[userId] = "exception"; // statusを"exception"として設定
+          // console.log("exceptionに変更");
           const finishMassages = [
-            "サポートはこれにて終了です！",
-            "お疲れさまでした！🫠",
-          ];
-          mes = finishMassages.map((text) => ({ type: "text", text }));
-          userStates[userId] = "exception"; // statusを"exception"として設定
-          console.log("exceptionに変更");
+            "お疲れ様でした！",
+            "最後に、一日の結果を見てみますか？"
+          ]
+          mes = finishMassages.map(text => ({ type: "text", text }));
+          const flexmessage = { type: "flex", altText: "一日の結果を見てみる？🥺", contents: askViewResult() };
+          mes.push(flexmessage);
+          userStates[userId] = "askViewResult";
+          console.log("askViewResultに変更");
         } else {
           const initialMessages = ["もっと具体的に言うと？"];
           const randomIndex = Math.floor(
@@ -123,8 +132,8 @@ async function makeReply(event) {
         const randomIndexWhy = Math.floor(Math.random() * whyMessages.length);
         if (randomIndexWhy === 0) {
           mes = { type: "text", text: whyMessages[randomIndexWhy] };
-          userStates[userId] = "finish";
-          console.log("finishに変更");
+          userStates[userId] = "askViewResult";
+          console.log("askViewResultに変更");
         } else {
           const latestTopic = await getLatestTopic(userId);
           console.log(latestTopic);
@@ -149,8 +158,8 @@ async function makeReply(event) {
         const randomIndexHow = Math.floor(Math.random() * howMessages.length);
         if (randomIndexHow === 0) {
           mes = { type: "text", text: howMessages[randomIndexHow] };
-          userStates[userId] = "finish";
-          console.log("finishに変更");
+          userStates[userId] = "askViewResult";
+          console.log("askViewResultに変更");
         } else {
           const latestTopic = await getLatestTopic(userId);
           console.log(latestTopic);
@@ -250,6 +259,8 @@ async function makeReply(event) {
           ]
           mes = finishMassages.map(text => ({ type: "text", text }));
           mes.push(image);
+          userStates[userId] = "Not supported";
+          console.log("Not supportedに変更");
         } else if (text === "いいえ") {
           const finishMassages = [
             "了解しました！",
@@ -257,14 +268,18 @@ async function makeReply(event) {
             "また利用してくださいね🫡"
           ]
           mes = finishMassages.map(text => ({ type: "text", text }));
-          userStates[userId] = "askViewResult";
-          console.log("askViewResultに変更");
+          userStates[userId] = "Not supported";
+          console.log("Not supportedに変更");
         }else {
-          mes = { type: "flex", altText: "他にもありそう？🤔", contents: askToContinue() };
+          const finishMassages = [
+            "お疲れ様でした！",
+            "最後に、一日の結果を見てみますか？"
+          ]
+          mes = finishMassages.map(text => ({ type: "text", text }));
+          const flexmessage = { type: "flex", altText: "一日の結果を見てみる？🥺", contents: askViewResult() };
+          mes.push(flexmessage);
           console.log("statusはaskViewResultのまま");
         }
-        userStates[userId] = "Not supported";
-        console.log("Not supportedに変更");
         break;
 
       case "finish":
