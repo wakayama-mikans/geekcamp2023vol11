@@ -4,6 +4,7 @@ const { askToContinue } = require("./flexmessages/userInteraction.js")
 const { choiceSpan } = require("./flexmessages/viewWordcloud.js")
 const { getWordCloud } = require("./createWordCloud.js")
 const { howToUseing } = require("./flexmessages/howToUse.js")
+const {selectJanalMode} = require("./flexmessages/selectJanalMode.js")
 
 // ユーザーごとの状態を管理するオブジェクト
 const userStates = {};
@@ -13,12 +14,11 @@ async function makeReply(event) {
   const text = event.message.text; // ユーザーが送信したテキスト
   let mes;
 
-  if (text === "ジャーナルスタート！") {
+  if(text === "ジャーナルサポート"){
+    mes = { type: "flex", altText: "ジャーナルサポート", contents: selectJanalMode() };
+  }else if (text === "未来について") {
     // ジャーナルの支援をリクエストした場合、状態を初期化
     userStates[userId] = "start";
-    // デバッグ用
-    // userStates[userId] = "finish";
-
     // メッセージリストからランダムに1つを選択
     const initialMessages = [
       "将来は何になりたいですか？",
@@ -32,7 +32,7 @@ async function makeReply(event) {
     // ユーザーに複数のメッセージを送信
     mes = responseMessages.map(text => ({ type: "text", text }));
 
-  } else if (text === "一日の振り返りがしたい") {
+  } else if (text === "今日について") {
     userStates[userId] = "dailyAchievements";
     // 一日の振り返り開始
     const responseMessages = [
