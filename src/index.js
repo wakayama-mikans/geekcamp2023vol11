@@ -4,7 +4,7 @@ const { howToUseing } = require("./flexmessages/howToUse.js"); // 返信生成�
 const express = require("express");
 const line = require("@line/bot-sdk");
 const PORT = process.env.EXPRESS_PORT;
-const { getUserIdList, insertUserId } = require("./database.js");
+const { insertUserId } = require("./database.js");
 
 // env呼び出し
 const config = {
@@ -60,12 +60,13 @@ app.listen(PORT);
 // 定期実行
 const cron = require("node-cron");
 const { postMorningMessage } = require("./regularExecution.js");
-//朝9時に実行
-// cron.schedule("0 0 9 * * *", () => {
-//   postMorningMessage();
-// });
 
-// //'秒 分 時 日 月 曜日' Debug用1分に1回実行
-cron.schedule('1 * * * * *', () => {
-    postMorningMessage(client);
+//朝9時に実行
+cron.schedule("0 0 9 * * *", () => {
+  postMorningMessage();
 });
+
+//Debug用1分に1回実行
+// cron.schedule('1 * * * * *', () => {
+//     postMorningMessage(client);
+// });
