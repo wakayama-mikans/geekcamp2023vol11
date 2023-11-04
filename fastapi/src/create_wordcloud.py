@@ -9,7 +9,7 @@ import io
 # ワードクラウドを生成する関数
 def create_wordcloud(inputData):
     fpath = "/usr/share/fonts/opentype/ipaexfont-gothic/ipaexg.ttf" # 日本語フォントのパスを指定
-    mask_array = np.array(Image.open('./mask.png')) # マスク画像の読み込み
+    mask_array = np.array(Image.open('./src/mask.png')) # マスク画像の読み込み
 
     word_frequencies = json.loads(inputData.text) # json形式のテキストデータを辞書型に変換
     sentiment = inputData.sentiment # 感情分析の結果

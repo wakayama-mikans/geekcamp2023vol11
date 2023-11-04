@@ -1,7 +1,7 @@
 FROM python:3.9
 USER root
 
-# WORKDIR /src
+WORKDIR /app
 
 RUN apt-get update
 RUN apt-get -y install locales && \
@@ -22,6 +22,6 @@ RUN pip install --no-cache-dir --upgrade -r requirements.txt
 # RUN apt-get update && apt-get install -y fonts-ipafont
 # RUN fc-cache -f -v
 
-COPY ./src/ .
+COPY ./ .
 
-CMD ["uvicorn", "main:app", "--reload", "--host", "0.0.0.0", "--port", "8888"]
+CMD ["uvicorn", "src.main:app", "--reload", "--host", "0.0.0.0", "--port", "8888"]
