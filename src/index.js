@@ -1,14 +1,15 @@
 require("dotenv").config();
-const { makeReply } = require("./makeReply.js");// 返信生成用の関数を読み込む
-const { howToUseing } = require("./flexmessages/howToUse.js");// 返信生成用の関数を読み込む
+const { makeReply } = require("./makeReply.js"); // 返信生成用の関数を読み込む
+const { howToUseing } = require("./flexmessages/howToUse.js"); // 返信生成用の関数を読み込む
 const express = require("express");
 const line = require("@line/bot-sdk");
 const PORT = process.env.EXPRESS_PORT;
+const { insertUserId } = require("./database.js");
 
 // env呼び出し
 const config = {
   channelSecret: process.env.LINE_CHANNEL_SECRET,
-  channelAccessToken: process.env.LINE_ACCESS_TOKEN
+  channelAccessToken: process.env.LINE_ACCESS_TOKEN,
 };
 
 // インスタンス生成
@@ -32,11 +33,16 @@ async function handleEvent(event) {
     mes = await makeReply(event);
   } else if (event.type === "follow") {
     // "follow" イベントの処理
-    mes = { type: "flex", altText: "使い方はこちら！🙂", contents: howToUseing() }; // howToUseing() 関数を呼び出す
+    const userId = event.source.userId; // LINEのユーザーID
+    await insertUserId(userId);
+    mes = {
+      type: "flex",
+      altText: "使い方はこちら！🙂",
+      contents: howToUseing(),
+    }; // howToUseing() 関数を呼び出す
   } else {
     return Promise.resolve(null);
   }
-
 
   // メッセージが空の場合は返信無し
   if (mes == null) {
@@ -50,3 +56,17 @@ async function handleEvent(event) {
 // 指定のポートで起動
 app.listen(PORT);
 // console.log(`Server running at ${PORT}`);
+
+// 定期実行
+const cron = require("node-cron");
+const { postMorningMessage } = require("./regularExecution.js");
+
+//朝9時に実行
+cron.schedule("0 0 9 * * *", () => {
+  postMorningMessage();
+});
+
+//Debug用1分に1回実行
+// cron.schedule('1 * * * * *', () => {
+//     postMorningMessage(client);
+// });
