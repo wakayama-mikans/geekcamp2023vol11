@@ -82,7 +82,7 @@ async function makeReply(event) {
     } else if (text === "1ヶ月の結果を見せて！") {
       date = 30;
     }
-    mes = await makeWordCloudReplyMessage(userId, 1);
+    mes = await makeWordCloudReplyMessage(userId, date);
     userStates[userId] = "Not supported";
   } else if (text === "自由につぶやく") {
     //フリーモード開始時の返答
