@@ -7,10 +7,10 @@ services:
     # for Apple Silicon Mac
     # platform: linux/arm64/v8
     build:
-      context: ./
+      context: ./node
       dockerfile: Dockerfile
     volumes:
-      - .:/app
+      - ./node:/app
       - node_modules_volume:/app/node_modules:delegated
     tty: true
     ports:
@@ -25,7 +25,7 @@ services:
     volumes:
       - ./ngrok.yml:/home/ngrok/.ngrok2/ngrok.yml
     ports:
-      - ${NGROK_PORT:-4040}:4040
+      - 4040:4040
     environment:
       NGROK_PORT: node:80
       NGROK_AUTH: ${NGROK_AUTH_TOKUN}
@@ -52,8 +52,8 @@ services:
     volumes:
       - ./fastapi:/app
     build:
-      context: ./
-      dockerfile: ./fastapi/Dockerfile
+      context: ./fastapi
+      dockerfile: Dockerfile
     ports:
       - 8888:8888
     tty: true
