@@ -334,7 +334,10 @@ async function makeReply(event) {
           console.log("statusはaskViewResultのまま");
         }
         break;
-
+      case "freeMode":
+        //相槌を返す
+        mes = getAgreementMessages()
+        break;
       case "finish":
         const finishMassages = [
           "お疲れ様でした！",
@@ -444,6 +447,17 @@ async function startTimeoutTimer(userId, timeoutInSeconds) {
 
   // タイムアウトIDをユーザーごとに保存
   userTimeouts[userId] = timeoutId;
+}
+
+function getAgreementMessages(){
+  const agreementMessages = [
+    "そうなんだ！😊",
+    "なるほど...🤔",
+    "うんうん🙂",
+    "すごくいいね😄",
+  ];
+  const randomIndex = Math.floor(Math.random() * agreementMessages.length);
+  return [{type:"text",text: agreementMessages[randomIndex]}];
 }
 
 module.exports = { makeReply };
