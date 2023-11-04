@@ -4,6 +4,7 @@ const { bucket } = require("./firebase-config.js");
 const { getTextByDate } = require("./database.js");
 const { analysisSentiment } = require("./analysissentiment.js"); // 感情分析API
 const { getAnalyzedWord } = require("./analysiswords.js"); // 形態素解析API
+const { getStopWords } = require("./stopwords.js"); // ストップワード取得API
 
 const fs = require("fs");
 const { promisify } = require("util");
@@ -16,7 +17,7 @@ async function getWordCloud(userId, date) {
   // console.log(targetTextData.length);
   const len_text = targetTextData.length; // 取得したテキストの数
   if (len_text == 0) {
-    return {err: "NoText"}
+    return { err: "NoText" };
   }
   const line_text = targetTextData.join(" "); // 取得したテキストを1文章に結合
   const arr_tmp = await getSentiment(line_text); // 感情分析APIに送信
@@ -33,6 +34,9 @@ async function getWordCloud(userId, date) {
 
   let myDictionary = {}; // 単語の辞書
 
+  // ストップワードを取得
+  const stopWords = getStopWords();
+
   // 品詞でフィルタリング
   for (var i = 0; i < words.length; i++) {
     if (
@@ -40,11 +44,14 @@ async function getWordCloud(userId, date) {
       words[i][3] == "動詞" ||
       words[i][3] == "形容詞"
     ) {
-      // 単語が初登場なら辞書に追加
-      if (myDictionary[words[i][0]] == null) {
-        myDictionary[words[i][0]] = 1;
-      } else {
-        myDictionary[words[i][0]] += 1;
+      // ストップワードを除外
+      if (stopWords.includes(words[i][0]) == false) {
+        // 単語が初登場なら辞書に追加
+        if (myDictionary[words[i][0]] == null) {
+          myDictionary[words[i][0]] = 1;
+        } else {
+          myDictionary[words[i][0]] += 1;
+        }
       }
     }
   }
@@ -70,7 +77,7 @@ async function getWordCloud(userId, date) {
     expires: "12-31-3020", //1000年後に設定
   });
 
-  return {result: {url}};
+  return { result: { url } };
 }
 
 async function getBinaryData(inputData) {
