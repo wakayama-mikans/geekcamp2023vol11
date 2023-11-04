@@ -44,7 +44,7 @@ function choiceSpan(){
           "type": "button",
           "action": {
             "type": "message",
-            "label": "1日の結果を見る",
+            "label": "1日",
             "text": "1日の結果を見せて！"
           },
           "margin": "lg"
@@ -53,7 +53,7 @@ function choiceSpan(){
           "type": "button",
           "action": {
             "type": "message",
-            "label": "1週間の結果を見る",
+            "label": "1週間",
             "text": "1週間の結果を見せて！"
           }
         },
@@ -61,7 +61,7 @@ function choiceSpan(){
           "type": "button",
           "action": {
             "type": "message",
-            "label": "1か月の結果を見る",
+            "label": "1か月",
             "text": "1ヶ月の結果を見せて！"
           }
         }
