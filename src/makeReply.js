@@ -3,6 +3,7 @@ const { otherOpinions } = require("./flexmessages/otherOpinions.js");
 const {
   askToContinue,
   askViewResult,
+  askFreeModeQuestion
 } = require("./flexmessages/userInteraction.js");
 const { choiceSpan } = require("./flexmessages/viewWordcloud.js");
 const { getWordCloud } = require("./createWordCloud.js");
@@ -86,10 +87,13 @@ async function makeReply(event) {
     userStates[userId] = "Not supported";
   } else if (text === "自由につぶやく") {
     //フリーモード開始時の返答
-    const freeModeMassages = [
-      "思ったことや，やりたいことを自由につぶやいてね✌️",
-    ];
-    mes = freeModeMassages.map((text) => ({ type: "text", text }));
+    //TODO:フリーモードのフレックスメッセージ
+    const flexmessage = {
+      type: "flex",
+      altText: "自由につぶやく",
+      contents: askFreeModeQuestion(),
+    };
+    mes.push(flexmessage);
     userStates[userId] = "freeMode";
 
   } else {
@@ -336,7 +340,20 @@ async function makeReply(event) {
         break;
       case "freeMode":
         //相槌を返す
-        mes = getAgreementMessages()
+        if(text === "はい"){
+          //ランダムな質問を返す
+          mes = getRandomQuestion()
+        }else if (text === "いいえ") {
+          mes = [{ type: "text", text: "そうなんだ！😊" }];
+          const freeModeMassages = [
+            "了解しました！",
+            "思ったことや，やりたいことを自由につぶやいてね✌️",
+          ];
+          mes = freeModeMassages.map((text) => ({ type: "text", text }));
+        }else{
+          mes = getAgreementMessages()
+        }
+        
         break;
       case "finish":
         const finishMassages = [
@@ -463,7 +480,7 @@ function getAgreementMessages(){
 function getRandomQuestion(){
   const questionMessages = [
     "最近嬉しかったことは？",
-    "最近イライラことは？",
+    "最近イライラしたことは？",
     "将来やってみたいことは？",
     "最近どんな新しい発見があった？",
     "やってみたい挑戦は？",
