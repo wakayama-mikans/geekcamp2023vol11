@@ -380,16 +380,15 @@ function timeOutTimer(userId) {
   if (userTimeouts[userId]) {
     clearTimeout(userTimeouts[userId]);
     delete userTimeouts[userId];
-    console.log("タイマーキャンセル")
   }
   startTimeoutTimer(userId, TIMEOUT);
 }
 
 async function startTimeoutTimer(userId, timeoutInSeconds) {
-  console.log("startTimeoutTimer")
   const timeoutId = setTimeout(async() => {
       // タイムアウト時の処理をここに記述
-      if((userStates[userId] !== "Not supported")||(userStates[userId] !== null)){
+      const status = userStates[userId]
+      if((status !== "Not supported")&&(status != undefined)&&(status !=null)){
         // ジャーナルサポート中のタイムアウト
         await postTimeOutMessage(userId);
       }
