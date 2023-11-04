@@ -59,35 +59,13 @@ app.listen(PORT);
 
 // 定期実行
 const cron = require("node-cron");
+const { postMorningMessage } = require("./regularExecution.js");
 //朝9時に実行
-cron.schedule("0 0 9 * * *", () => {
-  postMessage();
-});
-
-// //'秒 分 時 日 月 曜日' Debug用1分に1回実行
-// cron.schedule('1 * * * * *', () => {
-//     postMessage();
+// cron.schedule("0 0 9 * * *", () => {
+//   postMorningMessage();
 // });
 
-const { selectJanalMode } = require("./flexmessages/selectJanalMode.js");
-async function postMessage() {
-  const userIdList = await getUserIdList();
-  const messages = [
-    {
-      type: "text",
-      text: "おはようございます！🌞\n今日もジャーナルで自分の考えを整理しましょう！",
-    },
-    {
-      type: "flex",
-      altText: "ジャーナルサポート",
-      contents: selectJanalMode(),
-    },
-  ];
-  userIdList.map(async (userId) => {
-    try {
-      const res = await client.pushMessage(userId, messages);
-    } catch (error) {
-      console.log(`エラー: ${error}`);
-    }
-  });
-}
+// //'秒 分 時 日 月 曜日' Debug用1分に1回実行
+cron.schedule('1 * * * * *', () => {
+    postMorningMessage(client);
+});
