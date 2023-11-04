@@ -1,22 +1,13 @@
 require("dotenv").config();
+const { line, config, client } = require("./lineClient.js");
 const { makeReply } = require("./makeReply.js"); // 返信生成用の関数を読み込む
 const { howToUseing } = require("./flexmessages/howToUse.js"); // 返信生成用の関数を読み込む
 const express = require("express");
-const line = require("@line/bot-sdk");
 const PORT = process.env.EXPRESS_PORT;
 const { insertUserId } = require("./database.js");
 
-// env呼び出し
-const config = {
-  channelSecret: process.env.LINE_CHANNEL_SECRET,
-  channelAccessToken: process.env.LINE_ACCESS_TOKEN,
-};
-
-// インスタンス生成
-const app = express();
-const client = new line.Client(config);
-
 // ExpressアプリケーションのPOSTルート "/webhook" に対するハンドラ関数
+const app = express();
 app.post("/webhook", line.middleware(config), (req, res) => {
   console.log(req.body.events);
 
@@ -30,7 +21,7 @@ async function handleEvent(event) {
   // メッセージにのみ返信 followではフレックスメッセージを送信
   if (event.type === "message" && event.message.type === "text") {
     // メッセージイベントの処理
-    mes = await makeReply(event);
+    mes = await makeReply(event,client);
   } else if (event.type === "follow") {
     // "follow" イベントの処理
     const userId = event.source.userId; // LINEのユーザーID
@@ -63,7 +54,7 @@ const { postMorningMessage } = require("./regularExecution.js");
 
 //朝9時に実行
 cron.schedule("0 0 9 * * *", () => {
-  postMorningMessage();
+  postMorningMessage(client);
 });
 
 //Debug用1分に1回実行

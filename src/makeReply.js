@@ -5,14 +5,23 @@ const { choiceSpan } = require("./flexmessages/viewWordcloud.js")
 const { getWordCloud } = require("./createWordCloud.js")
 const { howToUseing } = require("./flexmessages/howToUse.js")
 const {selectJanalMode} = require("./flexmessages/selectJanalMode.js")
+const {client} = require("./lineClient.js")
+
 
 // ユーザーごとの状態を管理するオブジェクト
 const userStates = {};
+const userTimeouts = {};
+
+// const TIMEOUT = 1000 * 10; // 10秒(Debug)
+const TIMEOUT = 1000 * 60 * 5; // 5分
 
 async function makeReply(event) {
   const userId = event.source.userId; // LINEのユーザーID
   const text = event.message.text; // ユーザーが送信したテキスト
   let mes = [];
+
+  // タイムアウトタイマー
+  timeOutTimer(userId)
 
   if(text === "ジャーナルサポート"){
     mes = { type: "flex", altText: "ジャーナルサポート", contents: selectJanalMode() };
@@ -352,11 +361,43 @@ async function makeWordCloudReply(userId, date) {
       previewImageUrl: wordCloudURL[0],
     };
   }else{
-    //TODO:ERRメッセージ
     //TODO:0の時，n個以下のとき？
     mes = { type: "text", text: "もっとジャーナリングしてみよう" }
   }
   return mes;
+}
+
+async function postTimeOutMessage(userId){
+  const message = { type: "text", text: "ジャーナルサポートを終了します🫡" }
+  try {
+    const res = await client.pushMessage(userId, message);
+  } catch (error) {
+    console.log(`エラー: ${error}`);
+  }
+}
+
+function timeOutTimer(userId) {
+  if (userTimeouts[userId]) {
+    clearTimeout(userTimeouts[userId]);
+    delete userTimeouts[userId];
+  }
+  startTimeoutTimer(userId, TIMEOUT);
+}
+
+async function startTimeoutTimer(userId, timeoutInSeconds) {
+  const timeoutId = setTimeout(async() => {
+      // タイムアウト時の処理をここに記述
+      const status = userStates[userId]
+      if((status !== "Not supported")&&(status != undefined)&&(status !=null)){
+        // ジャーナルサポート中のタイムアウト
+        await postTimeOutMessage(userId);
+      }
+      userStates[userId] = "Not supported"
+      delete userTimeouts[userId];
+  }, timeoutInSeconds); // timeoutInSecondsは秒単位の時間
+
+  // タイムアウトIDをユーザーごとに保存
+  userTimeouts[userId] = timeoutId;
 }
 
 module.exports = { makeReply };
