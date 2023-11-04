@@ -50,3 +50,34 @@ async function handleEvent(event) {
 // 指定のポートで起動
 app.listen(PORT);
 // console.log(`Server running at ${PORT}`);
+
+// 
+
+// // cronの設定
+// const cron = require('node-cron');
+// //'秒 分 時 日 月 曜日'
+// cron.schedule('0 0 9 * * *', () => {
+//     console.log("おはよう！朝ご飯、ちゃんと食べた？( ﾟДﾟ)");
+// });
+const cron = require('node-cron');
+//'秒 分 時 日 月 曜日'
+cron.schedule('2 * * * * *', () => {
+    console.log("おはよう！朝ご飯、ちゃんと食べた？( ﾟДﾟ)");
+    // postMessage();
+});
+
+
+async function postMessage(){
+  const userId = "U6a473d6c9ac6194a06f42381e5fd0326"
+  const messages = [{
+    type: 'text',
+    text: "定期実行"
+  }];
+  try {
+    const res = await client.pushMessage(userId, messages);
+    console.log(res);        
+} catch (error) {
+    console.log(`エラー: ${error.statusMessage}`);
+    console.log(error.originalError.response.data);
+}
+}
