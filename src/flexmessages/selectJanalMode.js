@@ -56,10 +56,19 @@ function selectJanalMode() {
 						"text": "今日について"
 					},
 					"height": "md"
+				},
+				{
+					"type": "button",
+					"action": {
+						"type": "message",
+						"label": "自由につぶやく",
+						"text": "自由につぶやく"
+					},
+					"height": "md"
 				}
 			],
 			"paddingAll": "none",
-			"height": "120px",
+			"height": "160px",
 			"alignItems": "center",
 			"justifyContent": "center"
 		}
