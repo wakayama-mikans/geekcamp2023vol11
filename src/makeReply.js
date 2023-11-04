@@ -460,4 +460,22 @@ function getAgreementMessages(){
   return [{type:"text",text: agreementMessages[randomIndex]}];
 }
 
+function getRandomQuestion(){
+  const questionMessages = [
+    "最近嬉しかったことは？",
+    "最近イライラことは？",
+    "将来やってみたいことは？",
+    "最近どんな新しい発見があった？",
+    "やってみたい挑戦は？",
+    "心配なことってなんだろう？",
+    "君にとって幸せって何かな？",
+    "一番熱中できることは？",
+    "君のいいところを教えて！！",
+    "君の改善したいところを教えて！！",
+    "周りの人でどんな人にあこがれる？",
+  ];
+  const randomIndex = Math.floor(Math.random() * questionMessages.length);
+  return [{type:"text",text: questionMessages[randomIndex]}];
+}
+
 module.exports = { makeReply };
