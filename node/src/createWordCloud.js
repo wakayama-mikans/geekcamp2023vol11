@@ -1,5 +1,4 @@
 const axios = require("axios");
-const fastApiUrl = "http://fastapi:8888";
 const { bucket } = require("./firebase-config.js");
 const { getTextByDate } = require("./database.js");
 const { analysisSentiment } = require("./analysissentiment.js"); // 感情分析API
@@ -66,12 +65,12 @@ async function getWordCloud(userId, date) {
   //WordCLoud生成
   const binaryData = await getBinaryData(inputData);
   //Storage保存
-  const url = await storeWordCloud(userId,binaryData);
+  const url = await storeWordCloud(userId, binaryData);
 
-  return {result: {url}};
+  return { result: { url } };
 }
 
-async function storeWordCloud(userId,binaryData){
+async function storeWordCloud(userId, binaryData) {
   //ファイルの削除
   const files = await bucket.getFiles({
     startOffset: `wordClouds/${userId}/`,
@@ -82,9 +81,16 @@ async function storeWordCloud(userId,binaryData){
 
   //ファイルの保存
   const now = new Date();
-  const nowStr = "" + now.getFullYear()+ (now.getMonth() + 1) +  now.getDate()  + now.getHours()  + now.getMinutes() + now.getSeconds();
-  const fileName = nowStr+ ".png"; 
-  const filePath = "wordClouds/" + userId + "/"+fileName;
+  const nowStr =
+    "" +
+    now.getFullYear() +
+    (now.getMonth() + 1) +
+    now.getDate() +
+    now.getHours() +
+    now.getMinutes() +
+    now.getSeconds();
+  const fileName = nowStr + ".png";
+  const filePath = "wordClouds/" + userId + "/" + fileName;
   const file = bucket.file(filePath);
   await file.save(binaryData, {
     contentType: "image/png", // ファイルのコンテンツタイプを指定
@@ -100,7 +106,7 @@ async function storeWordCloud(userId,binaryData){
 
 async function getBinaryData(inputData) {
   try {
-    const response = await axios.post(`${fastApiUrl}/test`, inputData);
+    const response = await axios.post(`${process.env.GOOGLE_FUNCTIONS_URL}`, inputData);
     if (response.data && typeof response.data.image === "string") {
       // Base64エンコードされた文字列をデコードしてバイナリに変換
       const binaryData = Buffer.from(response.data.image, "base64");
@@ -127,9 +133,9 @@ async function getSentiment(line_text) {
     });
 
   arr_tmp = data.sentiment; // ポジティブ，ネガティブ，ニュートラルのいずれか
-  console.log("arr_tmp",arr_tmp);
+  // console.log("arr_tmp", arr_tmp);
   score = data.score;
-  console.log("score",score);
+  // console.log("score", score);
 
   return [arr_tmp, score];
 }
