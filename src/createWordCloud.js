@@ -11,10 +11,8 @@ const { promisify } = require("util");
 const writeFile = promisify(fs.writeFile);
 
 async function getWordCloud(userId, date) {
-  //TODO:WordCloud生成の引数設定：listから文字列変換（頻度分析・感情分析・形態素解析）をどうやるかによって分かれそう
   const targetTextData = await getTextByDate(userId, date);
-  // console.log(targetTextData);
-  // console.log(targetTextData.length);
+  // const targetTextData = ["サンプル文章", "テキスト", "データ", "サンプル"];
   const len_text = targetTextData.length; // 取得したテキストの数
   if (len_text == 0) {
     return { err: "NoText" };
@@ -63,21 +61,39 @@ async function getWordCloud(userId, date) {
     score: arr_tmp[1],
   };
 
-  //バイナリデータをPNG変換してFirebaseStorageに保存
+  //WordCLoud生成
   const binaryData = await getBinaryData(inputData);
-  //TODO:画像の保存保存場所の検討 現状はUserID.pngを更新し続けている（A：ランダム生成，B：作成後に削除，C：ファイル更新（<-現状これ)
-  const fileName = userId + ".png";
-  const file = bucket.file(fileName); // アップロードするファイルの名前を指定
+  //Storage保存
+  const url = await storeWordCloud(userId,binaryData);
+
+  return {result: {url}};
+}
+
+async function storeWordCloud(userId,binaryData){
+  //ファイルの削除
+  const files = await bucket.getFiles({
+    startOffset: `wordClouds/${userId}/`,
+  });
+  for (const item of files[0]) {
+    await bucket.file(item.name).delete();
+  }
+
+  //ファイルの保存
+  const now = new Date();
+  const nowStr = "" + now.getFullYear()+ (now.getMonth() + 1) +  now.getDate()  + now.getHours()  + now.getMinutes() + now.getSeconds();
+  const fileName = nowStr+ ".png"; 
+  const filePath = "wordClouds/" + userId + "/"+fileName;
+  const file = bucket.file(filePath);
   await file.save(binaryData, {
     contentType: "image/png", // ファイルのコンテンツタイプを指定
   });
 
-  const url = await bucket.file(fileName).getSignedUrl({
+  const url = await bucket.file(filePath).getSignedUrl({
     action: "read",
     expires: "12-31-3020", //1000年後に設定
   });
 
-  return { result: { url } };
+  return url;
 }
 
 async function getBinaryData(inputData) {
@@ -109,9 +125,9 @@ async function getSentiment(line_text) {
     });
 
   arr_tmp = data.sentiment; // ポジティブ，ネガティブ，ニュートラルのいずれか
-  console.log(arr_tmp);
+  console.log("arr_tmp",arr_tmp);
   score = data.score;
-  console.log(score);
+  console.log("score",score);
 
   return [arr_tmp, score];
 }
