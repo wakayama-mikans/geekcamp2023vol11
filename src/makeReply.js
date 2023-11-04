@@ -89,13 +89,7 @@ async function makeReply(event) {
     userStates[userId] = {states:"Not supported"};
   } else if (text === "自由につぶやく") {
     //フリーモード開始時の返答
-    //TODO:フリーモードのフレックスメッセージ
-    const flexmessage = {
-      type: "flex",
-      altText: "自由につぶやく",
-      contents: askFreeModeQuestion(),
-    };
-    mes.push(flexmessage);
+    mes=getRandomQuestion();
     userStates[userId] = {states:"freeMode",count:0};
 
   } else {
@@ -342,8 +336,9 @@ async function makeReply(event) {
         break;
       case "freeMode":
         userStates[userId].count += 1;
+        const count = userStates[userId].count;
         //相槌を返す
-        if(text === "はい"){
+        if(count % 5 == 0){
           //ランダムな質問を返す
           mes = getRandomQuestion()
         }else{
@@ -474,6 +469,12 @@ function getAgreementMessages(){
 }
 
 function getRandomQuestion(){
+  const questionThrowMessages = [
+    "悩んでいたら下の質問に答えてみてほしいな！😊",
+    "下の質問の答えが知りたいな!🤔",
+    "下の質問に答えてみて！😄",
+    "この視点から考えてみよう！😄"
+  ];
   const questionMessages = [
     "最近嬉しかったことは？",
     "最近イライラしたことは？",
@@ -487,8 +488,9 @@ function getRandomQuestion(){
     "君の改善したいところを教えて！！",
     "周りの人でどんな人にあこがれる？",
   ];
-  const randomIndex = Math.floor(Math.random() * questionMessages.length);
-  return [{type:"text",text: questionMessages[randomIndex]}];
+  const randomIndexQuestionThrowMessages = Math.floor(Math.random() * questionThrowMessages.length);
+  const randomIndexQuestionMessages = Math.floor(Math.random() * questionMessages.length);
+  return [{type:"text",text: questionThrowMessages[randomIndexQuestionThrowMessages]},{type:"text",text: questionMessages[randomIndexQuestionMessages]}];
 }
 
 module.exports = { makeReply };
