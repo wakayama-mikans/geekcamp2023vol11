@@ -90,6 +90,8 @@ async function makeReply(event) {
       "思ったことや，やりたいことを自由につぶやいてね✌️",
     ];
     mes = freeModeMassages.map((text) => ({ type: "text", text }));
+    userStates[userId] = "freeMode";
+
   } else {
     if (text !== "はい" && text !== "いいえ" && userStates[userId]) {
       // id, status, textをDBに格納
