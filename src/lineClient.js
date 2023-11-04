@@ -1,5 +1,4 @@
 const line = require("@line/bot-sdk");
-const express = require("express");
 
 // env呼び出し
 const config = {
@@ -8,7 +7,6 @@ const config = {
 };
 
 // インスタンス生成
-const app = express();
 const client = new line.Client(config);
 
-module.exports = {line, config, app, client };
+module.exports = {line, config, client };

@@ -1,5 +1,5 @@
 require("dotenv").config();
-const { line, config, app, client } = require("./lineClient.js");
+const { line, config, client } = require("./lineClient.js");
 const { makeReply } = require("./makeReply.js"); // 返信生成用の関数を読み込む
 const { howToUseing } = require("./flexmessages/howToUse.js"); // 返信生成用の関数を読み込む
 const express = require("express");
@@ -7,6 +7,7 @@ const PORT = process.env.EXPRESS_PORT;
 const { insertUserId } = require("./database.js");
 
 // ExpressアプリケーションのPOSTルート "/webhook" に対するハンドラ関数
+const app = express();
 app.post("/webhook", line.middleware(config), (req, res) => {
   console.log(req.body.events);
 
