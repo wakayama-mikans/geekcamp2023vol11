@@ -12,9 +12,11 @@ const writeFile = promisify(fs.writeFile);
 
 async function getWordCloud(userId, date) {
   const targetTextData = await getTextByDate(userId, date);
-  // const targetTextData = ["サンプル文章", "テキスト", "データ", "サンプル"];
-  const len_text = targetTextData.length; // 取得したテキストの数
-  if (len_text == 0) {
+  // console.log(targetTextData);
+  // console.log(targetTextData.length);
+  if (targetTextData && targetTextData.length > 0) {
+    const len_text = targetTextData.length; // 取得したテキストの数
+  } else {
     return { err: "NoText" };
   }
   const line_text = targetTextData.join(" "); // 取得したテキストを1文章に結合
