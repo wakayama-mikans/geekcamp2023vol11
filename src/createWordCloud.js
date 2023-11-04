@@ -22,8 +22,8 @@ async function getWordCloud(userId, date) {
   const line_text = targetTextData.join(" "); // 取得したテキストを1文章に結合
   const arr_tmp = await getSentiment(line_text); // 感情分析APIに送信
 
-  const sentimentType = arr_tmp[0]
-  const sentimentScore = arr_tmp[1]
+  const sentimentType = arr_tmp[0];
+  const sentimentScore = arr_tmp[1];
 
   // YahooAPIで形態素解析
   words = await getAnalyzedWord(line_text)
@@ -69,12 +69,12 @@ async function getWordCloud(userId, date) {
   //WordCLoud生成
   const binaryData = await getBinaryData(inputData);
   //Storage保存
-  const url = await storeWordCloud(userId,binaryData);
+  const url = await storeWordCloud(userId, binaryData);
 
-  return {result: {url, sentimentType, sentimentScore}};
+  return { result: { url, sentimentType, sentimentScore } };
 }
 
-async function storeWordCloud(userId,binaryData){
+async function storeWordCloud(userId, binaryData) {
   //ファイルの削除
   const files = await bucket.getFiles({
     startOffset: `wordClouds/${userId}/`,
@@ -85,9 +85,16 @@ async function storeWordCloud(userId,binaryData){
 
   //ファイルの保存
   const now = new Date();
-  const nowStr = "" + now.getFullYear()+ (now.getMonth() + 1) +  now.getDate()  + now.getHours()  + now.getMinutes() + now.getSeconds();
-  const fileName = nowStr+ ".png"; 
-  const filePath = "wordClouds/" + userId + "/"+fileName;
+  const nowStr =
+    "" +
+    now.getFullYear() +
+    (now.getMonth() + 1) +
+    now.getDate() +
+    now.getHours() +
+    now.getMinutes() +
+    now.getSeconds();
+  const fileName = nowStr + ".png";
+  const filePath = "wordClouds/" + userId + "/" + fileName;
   const file = bucket.file(filePath);
   await file.save(binaryData, {
     contentType: "image/png", // ファイルのコンテンツタイプを指定

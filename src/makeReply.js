@@ -69,15 +69,19 @@ async function makeReply(event) {
       altText: "結果を見てみよう！😎",
       contents: choiceSpan(),
     };
-  } else if ((text === "1日の結果を見せて！")||(text === "1週間の結果を見せて！")||(text === "1ヶ月の結果を見せて！")) {
+  } else if (
+    text === "1日の結果を見せて！" ||
+    text === "1週間の結果を見せて！" ||
+    text === "1ヶ月の結果を見せて！"
+  ) {
     //WordCloud生成
-    if(text === "1日の結果を見せて！"){
+    if (text === "1日の結果を見せて！") {
       date = 1;
-    }else if(text === "1週間の結果を見せて！"){
+    } else if (text === "1週間の結果を見せて！") {
       date = 7;
-    }else if(text === "1ヶ月の結果を見せて！"){
+    } else if (text === "1ヶ月の結果を見せて！") {
       date = 30;
-    }    
+    }
     mes = await makeWordCloudReplyMessage(userId, 1);
     userStates[userId] = "Not supported";
   } else if (text === "自由につぶやく") {
@@ -387,21 +391,21 @@ async function makeWordCloudReplyMessage(userId, date) {
 function getSentimentText(sentimentType, sentimentScore) {
   if (sentimentType === "Positive") {
     if (sentimentScore > 0.6) {
-      message = "君は絶好調だね🤩"
+      message = "君は絶好調だね🤩";
     } else if (sentimentScore > 0.5) {
-      message = "ハッピーな言葉が多いね🤗"
+      message = "ハッピーな言葉が多いね🤗";
     } else if (sentimentScore > 0.4) {
-      message = "とっても楽しそうな頭の中だね😝"
-    }else{
-      message = "わくわくするようなことが書かれているね😊"
+      message = "とっても楽しそうな頭の中だね😝";
+    } else {
+      message = "わくわくするようなことが書かれているね😊";
     }
   } else if (sentimentType === "Negative") {
-    if(sentimentScore > 0.5){
-      message = "ポジティブな発言が多いと頭の中が明るくなるよ！🥰"
-    }else{
-      message = "楽しくなるようなつぶやきもしてみよう！😝"
+    if (sentimentScore > 0.5) {
+      message = "ポジティブな発言が多いと頭の中が明るくなるよ！🥰";
+    } else {
+      message = "楽しくなるようなつぶやきもしてみよう！😝";
     }
-  }else{
+  } else {
     message = "穏やかな気持ちで過ごせたね！😊";
   }
   return { type: "text", text: message };
