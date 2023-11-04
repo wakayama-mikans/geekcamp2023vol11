@@ -58,7 +58,7 @@ async function getWordCloud(userId, date) {
 
   // FastAPIに送信するデータ
   const inputData = {
-    text: JSON.stringify(myDictionary),
+    text: myDictionary,
     sentiment: arr_tmp[0],
     score: arr_tmp[1],
   };

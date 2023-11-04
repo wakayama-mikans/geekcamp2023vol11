@@ -5,7 +5,7 @@ from src.create_wordcloud import create_wordcloud
 
 # ここでnode側からのデータを受け取るためのクラスを定義
 class RequestData(BaseModel):
-    text: str
+    text: dict
     sentiment: str
     score: float
 
