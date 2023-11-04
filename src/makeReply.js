@@ -16,6 +16,7 @@ async function makeReply(event) {
 
   if(text === "ジャーナルサポート"){
     mes = { type: "flex", altText: "ジャーナルサポート", contents: selectJanalMode() };
+
   }else if (text === "未来について") {
     // ジャーナルの支援をリクエストした場合、状態を初期化
     userStates[userId] = "start";
@@ -60,6 +61,7 @@ async function makeReply(event) {
     mes.push(image);
     userStates[userId] = "Not supported";
     console.log("Not supportedに変更");
+
   } else if (text === "1週間の結果を見せて！") {
     // 7日分のワードクラウドを作成
     const image = await makeWordCloudReply(userId, 7);
@@ -71,6 +73,7 @@ async function makeReply(event) {
     mes.push(image);
     userStates[userId] = "Not supported";
     console.log("Not supportedに変更");
+
   } else if (text === "1ヶ月の結果を見せて！") {
     // 30日分のワードクラウドを作成
     const image = await makeWordCloudReply(userId, 30);
@@ -82,8 +85,11 @@ async function makeReply(event) {
     mes.push(image);
     userStates[userId] = "Not supported";
     console.log("Not supportedに変更");
-  } else {
 
+  } else {
+    // if ((text !== "はい" && text !== "いいえ") && userStates[userId]) {
+    //   insertData(userId, userStates[userId], text);
+    // }
     // DB格納処理
     if (userStates[userId]) {
       if (text !== "はい" && text !== "いいえ") {
