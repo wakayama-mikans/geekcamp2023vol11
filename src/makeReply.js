@@ -341,6 +341,7 @@ async function makeReply(event) {
         }
         break;
       case "freeMode":
+        userStates[userId].count += 1;
         //相槌を返す
         if(text === "はい"){
           //ランダムな質問を返す
