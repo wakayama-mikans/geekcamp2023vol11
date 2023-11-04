@@ -23,6 +23,8 @@ async function makeReply(event) {
   const text = event.message.text; // ユーザーが送信したテキスト
   let mes = [];
 
+  console.log(userStates)
+
   // タイムアウトタイマー
   timeOutTimer(userId);
 
@@ -34,7 +36,7 @@ async function makeReply(event) {
     };
   } else if (text === "未来について") {
     // ジャーナルの支援をリクエストした場合、状態を初期化
-    userStates[userId] = "start";
+    userStates[userId] = {states:"start"};
     // メッセージリストからランダムに1つを選択
     const initialMessages = [
       "将来は何になりたいですか？",
@@ -48,7 +50,7 @@ async function makeReply(event) {
     // ユーザーに複数のメッセージを送信
     mes = responseMessages.map((text) => ({ type: "text", text }));
   } else if (text === "今日について") {
-    userStates[userId] = "dailyAchievements";
+    userStates[userId] = {states:"dailyAchievements"};
     // 1日の振り返り開始
     const responseMessages = [
       "1日の振り返りを始めます！",
@@ -84,7 +86,7 @@ async function makeReply(event) {
       date = 30;
     }
     mes = await makeWordCloudReplyMessage(userId, date);
-    userStates[userId] = "Not supported";
+    userStates[userId] = {states:"Not supported"};
   } else if (text === "自由につぶやく") {
     //フリーモード開始時の返答
     //TODO:フリーモードのフレックスメッセージ
@@ -94,7 +96,7 @@ async function makeReply(event) {
       contents: askFreeModeQuestion(),
     };
     mes.push(flexmessage);
-    userStates[userId] = "freeMode";
+    userStates[userId] = {states:"freeMode",count:0};
 
   } else {
     if (text !== "はい" && text !== "いいえ" && userStates[userId]) {
@@ -103,7 +105,7 @@ async function makeReply(event) {
     }
 
     // ステータスに応じて挙動を決める
-    switch (userStates[userId]) {
+    switch (userStates[userId].states) {
       case "start":
         // 最初のやり取り
         if (text === "いいえ") {
@@ -125,7 +127,7 @@ async function makeReply(event) {
             contents: askViewResult(),
           };
           mes.push(flexmessage);
-          userStates[userId] = "askViewResult";
+          userStates[userId] = {states:"askViewResult"};
           console.log("askViewResultに変更");
         } else {
           const initialMessages = ["もっと具体的に言うと？"];
@@ -133,7 +135,7 @@ async function makeReply(event) {
             Math.random() * initialMessages.length
           );
           mes = { type: "text", text: initialMessages[randomIndex] };
-          userStates[userId] = "topic"; // statusを"topic"として設定
+          userStates[userId] = {states: "topic"}; // statusを"topic"として設定
           console.log("topicに変更");
         }
         break;
@@ -149,10 +151,10 @@ async function makeReply(event) {
         );
         mes = { type: "text", text: topicMessages[randomIndexTopic] };
         if (randomIndexTopic === 0) {
-          userStates[userId] = "why";
+            userStates[userId] = {status:"why"};
           console.log("whyに変更");
         } else {
-          userStates[userId] = "how";
+          userStates[userId] = {states:"how"};
           console.log("howに変更");
         }
         // userStates[userId].lastMessage = topicMessages[randomIndexTopic];
@@ -169,7 +171,7 @@ async function makeReply(event) {
         const randomIndexWhy = Math.floor(Math.random() * whyMessages.length);
         if (randomIndexWhy === 0) {
           mes = { type: "text", text: whyMessages[randomIndexWhy] };
-          userStates[userId] = "askViewResult";
+          userStates[userId] = {states:"askViewResult"};
           console.log("askViewResultに変更");
         } else {
           const latestTopic = await getLatestTopic(userId);
@@ -179,7 +181,7 @@ async function makeReply(event) {
             altText: "他の選択肢について考えてみよう！😎",
             contents: otherOpinions(latestTopic),
           };
-          userStates[userId] = "start";
+          userStates[userId] = {states:"start"};
           console.log("startに変更");
         }
         break;
@@ -195,7 +197,7 @@ async function makeReply(event) {
         const randomIndexHow = Math.floor(Math.random() * howMessages.length);
         if (randomIndexHow === 0) {
           mes = { type: "text", text: howMessages[randomIndexHow] };
-          userStates[userId] = "askViewResult";
+          userStates[userId] = {states:"askViewResult"};
           console.log("askViewResultに変更");
         } else {
           const latestTopic = await getLatestTopic(userId);
@@ -205,7 +207,7 @@ async function makeReply(event) {
             altText: "他の選択肢について考えてみよう！😎",
             contents: otherOpinions(latestTopic),
           };
-          userStates[userId] = "start";
+          userStates[userId] = {states:"start"};
           console.log("startに変更");
         }
         break;
@@ -220,7 +222,7 @@ async function makeReply(event) {
             "じゃあ次は、今日できなかったことについて教えて！🤔",
           ];
           mes = nextMassages.map((text) => ({ type: "text", text }));
-          userStates[userId] = "dailyRegrets";
+          userStates[userId] = {states:"dailyRegrets"};
           console.log("dailyRegretsに変更");
         } else {
           mes = {
@@ -246,7 +248,7 @@ async function makeReply(event) {
             "次は、そこから得られた気付きや学びを挙げてみよう😊",
           ];
           mes = nextMassages.map((text) => ({ type: "text", text }));
-          userStates[userId] = "dailyNotice";
+          userStates[userId] = {states:"dailyNotice"};
           console.log("dailyNoticeに変更");
         } else {
           mes = {
@@ -268,7 +270,7 @@ async function makeReply(event) {
             "じゃあ最後に、それらを踏まえてこれからしたいことも書いてみよう😉",
           ];
           mes = nextMassages.map((text) => ({ type: "text", text }));
-          userStates[userId] = "dailyFuture";
+          userStates[userId] = {states:"dailyFuture"};
           console.log("dailyFutureに変更");
         } else {
           mes = {
@@ -296,7 +298,7 @@ async function makeReply(event) {
             contents: askViewResult(),
           };
           mes.push(flexmessage);
-          userStates[userId] = "askViewResult";
+          userStates[userId] = {states:"askViewResult"};
           console.log("askViewResultに変更");
         } else {
           mes = {
@@ -312,7 +314,7 @@ async function makeReply(event) {
         if (text === "はい") {
           // 1日分のワードクラウドを作成
           mes = await makeWordCloudReplyMessage(userId, 1);
-          userStates[userId] = "Not supported";
+          userStates[userId] = {states:"Not supported"};
           console.log("Not supportedに変更");
         } else if (text === "いいえ") {
           const finishMassages = [
@@ -321,7 +323,7 @@ async function makeReply(event) {
             "また利用してくださいね🫡",
           ];
           mes = finishMassages.map((text) => ({ type: "text", text }));
-          userStates[userId] = "Not supported";
+          userStates[userId] = {states:"Not supported"};
           console.log("Not supportedに変更");
         } else {
           const finishMassages = [
@@ -343,13 +345,6 @@ async function makeReply(event) {
         if(text === "はい"){
           //ランダムな質問を返す
           mes = getRandomQuestion()
-        }else if (text === "いいえ") {
-          mes = [{ type: "text", text: "そうなんだ！😊" }];
-          const freeModeMassages = [
-            "了解しました！",
-            "思ったことや，やりたいことを自由につぶやいてね✌️",
-          ];
-          mes = freeModeMassages.map((text) => ({ type: "text", text }));
         }else{
           mes = getAgreementMessages()
         }
@@ -372,8 +367,8 @@ async function makeReply(event) {
 
       default:
         mes = null;
-        userStates[userId] = "Not supported";
-        insertData(userId, userStates[userId], text);
+        userStates[userId] = {states:"Not supported"};
+        insertData(userId, userStates[userId].states, text);
     }
   }
 
@@ -453,12 +448,12 @@ function timeOutTimer(userId) {
 async function startTimeoutTimer(userId, timeoutInSeconds) {
   const timeoutId = setTimeout(async () => {
     // タイムアウト時の処理をここに記述
-    const status = userStates[userId];
+    const status = userStates[userId].states;
     if (status !== "Not supported" && status != undefined && status != null) {
       // ジャーナルサポート中のタイムアウト
       await postTimeOutMessage(userId);
     }
-    userStates[userId] = "Not supported";
+    userStates[userId] = {states:"Not supported"};
     delete userTimeouts[userId];
   }, timeoutInSeconds); // timeoutInSecondsは秒単位の時間
 
