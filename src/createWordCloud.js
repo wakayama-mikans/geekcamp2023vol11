@@ -15,8 +15,9 @@ async function getWordCloud(userId, date) {
   const targetTextData = await getTextByDate(userId, date);
   // console.log(targetTextData);
   // console.log(targetTextData.length);
-  const len_text = targetTextData.length; // 取得したテキストの数
-  if (len_text == 0) {
+  if (targetTextData && targetTextData.length > 0) {
+    const len_text = targetTextData.length; // 取得したテキストの数
+  } else {
     return { err: "NoText" };
   }
   const line_text = targetTextData.join(" "); // 取得したテキストを1文章に結合
