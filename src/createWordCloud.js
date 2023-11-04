@@ -22,6 +22,9 @@ async function getWordCloud(userId, date) {
   const line_text = targetTextData.join(" "); // 取得したテキストを1文章に結合
   const arr_tmp = await getSentiment(line_text); // 感情分析APIに送信
 
+  const sentimentType = arr_tmp[0];
+  const sentimentScore = arr_tmp[1];
+
   // YahooAPIで形態素解析
   words = await getAnalyzedWord(line_text)
     .then((response) => {
@@ -59,19 +62,19 @@ async function getWordCloud(userId, date) {
   // FastAPIに送信するデータ
   const inputData = {
     text: JSON.stringify(myDictionary),
-    sentiment: arr_tmp[0],
-    score: arr_tmp[1],
+    sentiment: sentimentType,
+    score: sentimentScore,
   };
 
   //WordCLoud生成
   const binaryData = await getBinaryData(inputData);
   //Storage保存
-  const url = await storeWordCloud(userId,binaryData);
+  const url = await storeWordCloud(userId, binaryData);
 
-  return {result: {url}};
+  return { result: { url, sentimentType, sentimentScore } };
 }
 
-async function storeWordCloud(userId,binaryData){
+async function storeWordCloud(userId, binaryData) {
   //ファイルの削除
   const files = await bucket.getFiles({
     startOffset: `wordClouds/${userId}/`,
@@ -82,9 +85,16 @@ async function storeWordCloud(userId,binaryData){
 
   //ファイルの保存
   const now = new Date();
-  const nowStr = "" + now.getFullYear()+ (now.getMonth() + 1) +  now.getDate()  + now.getHours()  + now.getMinutes() + now.getSeconds();
-  const fileName = nowStr+ ".png"; 
-  const filePath = "wordClouds/" + userId + "/"+fileName;
+  const nowStr =
+    "" +
+    now.getFullYear() +
+    (now.getMonth() + 1) +
+    now.getDate() +
+    now.getHours() +
+    now.getMinutes() +
+    now.getSeconds();
+  const fileName = nowStr + ".png";
+  const filePath = "wordClouds/" + userId + "/" + fileName;
   const file = bucket.file(filePath);
   await file.save(binaryData, {
     contentType: "image/png", // ファイルのコンテンツタイプを指定
@@ -127,9 +137,7 @@ async function getSentiment(line_text) {
     });
 
   arr_tmp = data.sentiment; // ポジティブ，ネガティブ，ニュートラルのいずれか
-  console.log("arr_tmp",arr_tmp);
   score = data.score;
-  console.log("score",score);
 
   return [arr_tmp, score];
 }

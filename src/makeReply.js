@@ -1,12 +1,14 @@
-const { insertData, getLatestTopic,getTextByDate } = require("./database.js"); // データベース関連の関数をdatabase.jsから読み込む
-const { otherOpinions } = require("./flexmessages/otherOpinions.js")
-const { askToContinue, askViewResult } = require("./flexmessages/userInteraction.js")
-const { choiceSpan } = require("./flexmessages/viewWordcloud.js")
-const { getWordCloud } = require("./createWordCloud.js")
-const { howToUseing } = require("./flexmessages/howToUse.js")
-const {selectJanalMode} = require("./flexmessages/selectJanalMode.js")
-const {client} = require("./lineClient.js")
-
+const { insertData, getLatestTopic, getTextByDate } = require("./database.js"); // データベース関連の関数をdatabase.jsから読み込む
+const { otherOpinions } = require("./flexmessages/otherOpinions.js");
+const {
+  askToContinue,
+  askViewResult,
+} = require("./flexmessages/userInteraction.js");
+const { choiceSpan } = require("./flexmessages/viewWordcloud.js");
+const { getWordCloud } = require("./createWordCloud.js");
+const { howToUseing } = require("./flexmessages/howToUse.js");
+const { selectJanalMode } = require("./flexmessages/selectJanalMode.js");
+const { client } = require("./lineClient.js");
 
 // ユーザーごとの状態を管理するオブジェクト
 const userStates = {};
@@ -21,11 +23,15 @@ async function makeReply(event) {
   let mes = [];
 
   // タイムアウトタイマー
-  timeOutTimer(userId)
+  timeOutTimer(userId);
 
-  if(text === "ジャーナルサポート"){
-    mes = { type: "flex", altText: "ジャーナルサポート", contents: selectJanalMode() };
-  }else if (text === "未来について") {
+  if (text === "ジャーナルサポート") {
+    mes = {
+      type: "flex",
+      altText: "ジャーナルサポート",
+      contents: selectJanalMode(),
+    };
+  } else if (text === "未来について") {
     // ジャーナルの支援をリクエストした場合、状態を初期化
     userStates[userId] = "start";
     // メッセージリストからランダムに1つを選択
@@ -39,73 +45,53 @@ async function makeReply(event) {
       initialMessages[randomIndex],
     ];
     // ユーザーに複数のメッセージを送信
-    mes = responseMessages.map(text => ({ type: "text", text }));
-
+    mes = responseMessages.map((text) => ({ type: "text", text }));
   } else if (text === "今日について") {
     userStates[userId] = "dailyAchievements";
     // 1日の振り返り開始
     const responseMessages = [
       "1日の振り返りを始めます！",
-      "今日、実行できたことを挙げてみよう😊"
+      "今日、実行できたことを挙げてみよう😊",
     ];
     // ユーザーに複数のメッセージを送信
-    mes = responseMessages.map(text => ({ type: "text", text }));
-
+    mes = responseMessages.map((text) => ({ type: "text", text }));
   } else if (text === "使い方を教えて！") {
     // 期間選択フレックスメッセージの送信
-    mes = { type: "flex", altText: "使い方はこちら！🙂", contents: howToUseing() };
-
+    mes = {
+      type: "flex",
+      altText: "使い方はこちら！🙂",
+      contents: howToUseing(),
+    };
   } else if (text === "結果がみたい") {
     // 期間選択フレックスメッセージの送信
-    mes = { type: "flex", altText: "結果を見てみよう！😎", contents: choiceSpan() };
-
-  } else if (text === "1日の結果を見せて！") {
-    const image = await makeWordCloudReply(userId, 1);
-    if(image.type === "image"){
-      const finishMassages = [
-        "1日分の結果がこれです！",
-        "また利用してくださいね🫡",
-      ];
-      mes = finishMassages.map((text) => ({ type: "text", text }));
+    mes = {
+      type: "flex",
+      altText: "結果を見てみよう！😎",
+      contents: choiceSpan(),
+    };
+  } else if (
+    text === "1日の結果を見せて！" ||
+    text === "1週間の結果を見せて！" ||
+    text === "1ヶ月の結果を見せて！"
+  ) {
+    //WordCloud生成
+    if (text === "1日の結果を見せて！") {
+      date = 1;
+    } else if (text === "1週間の結果を見せて！") {
+      date = 7;
+    } else if (text === "1ヶ月の結果を見せて！") {
+      date = 30;
     }
-    mes.push(image);
+    mes = await makeWordCloudReplyMessage(userId, date);
     userStates[userId] = "Not supported";
-    console.log("Not supportedに変更");
-  } else if (text === "1週間の結果を見せて！") {
-    // 7日分のワードクラウドを作成
-    const image = await makeWordCloudReply(userId, 7);
-    if (image.type === "image") {
-      const finishMassages = [
-        "1週間分の結果がこれです！",
-        "また利用してくださいね🫡",
-      ];
-      mes = finishMassages.map((text) => ({ type: "text", text }));
-    }
-    mes.push(image);
-    userStates[userId] = "Not supported";
-    console.log("Not supportedに変更");
-  } else if (text === "1ヶ月の結果を見せて！") {
-    // 30日分のワードクラウドを作成
-    const image = await makeWordCloudReply(userId, 30);
-    if (image.type === "image") {
-      const finishMassages = [
-        "1か月の結果がこれです！",
-        "また利用してくださいね🫡",
-      ];
-      mes = finishMassages.map((text) => ({ type: "text", text }));
-    }
-    mes.push(image);
-    userStates[userId] = "Not supported";
-    console.log("Not supportedに変更");
-  }else if(text === "自由につぶやく"){
+  } else if (text === "自由につぶやく") {
     //フリーモード開始時の返答
     const freeModeMassages = [
       "思ったことや，やりたいことを自由につぶやいてね✌️",
     ];
     mes = freeModeMassages.map((text) => ({ type: "text", text }));
   } else {
-
-    if ((text !== "はい" && text !== "いいえ" ) && userStates[userId]){
+    if (text !== "はい" && text !== "いいえ" && userStates[userId]) {
       // id, status, textをDBに格納
       insertData(userId, userStates[userId], text);
     }
@@ -124,10 +110,14 @@ async function makeReply(event) {
           // console.log("exceptionに変更");
           const finishMassages = [
             "お疲れ様でした！",
-            "最後に、1日の結果を見てみますか？"
-          ]
-          mes = finishMassages.map(text => ({ type: "text", text }));
-          const flexmessage = { type: "flex", altText: "1日の結果を見てみる？🥺", contents: askViewResult() };
+            "最後に、1日の結果を見てみますか？",
+          ];
+          mes = finishMassages.map((text) => ({ type: "text", text }));
+          const flexmessage = {
+            type: "flex",
+            altText: "1日の結果を見てみる？🥺",
+            contents: askViewResult(),
+          };
           mes.push(flexmessage);
           userStates[userId] = "askViewResult";
           console.log("askViewResultに変更");
@@ -221,32 +211,43 @@ async function makeReply(event) {
         } else if (text === "いいえ") {
           const nextMassages = [
             "よく頑張ったね！",
-            "じゃあ次は、今日できなかったことについて教えて！🤔"
-          ]
-          mes = nextMassages.map(text => ({ type: "text", text }));
+            "じゃあ次は、今日できなかったことについて教えて！🤔",
+          ];
+          mes = nextMassages.map((text) => ({ type: "text", text }));
           userStates[userId] = "dailyRegrets";
           console.log("dailyRegretsに変更");
-        }else {
-          mes = { type: "flex", altText: "他にもありそう？🤔", contents: askToContinue() };
+        } else {
+          mes = {
+            type: "flex",
+            altText: "他にもありそう？🤔",
+            contents: askToContinue(),
+          };
           console.log("statusはdailyAchievementsのまま");
         }
         break;
 
       case "dailyRegrets":
         if (text === "はい") {
-          mes = { type: "text", text: "じゃあ、他にできなかったことを教えて！😗" };
+          mes = {
+            type: "text",
+            text: "じゃあ、他にできなかったことを教えて！😗",
+          };
           console.log("statusはdailyRegretsのまま");
         } else if (text === "いいえ") {
           const nextMassages = [
             "お疲れさま！",
             "1日の出来事についてまとめられたね",
-            "次は、そこから得られた気付きや学びを挙げてみよう😊"
-          ]
-          mes = nextMassages.map(text => ({ type: "text", text }));
+            "次は、そこから得られた気付きや学びを挙げてみよう😊",
+          ];
+          mes = nextMassages.map((text) => ({ type: "text", text }));
           userStates[userId] = "dailyNotice";
           console.log("dailyNoticeに変更");
-        }else {
-          mes = { type: "flex", altText: "他にもありそう？🤔", contents: askToContinue() };
+        } else {
+          mes = {
+            type: "flex",
+            altText: "他にもありそう？🤔",
+            contents: askToContinue(),
+          };
           console.log("statusはdailyRegretsのまま");
         }
         break;
@@ -258,13 +259,17 @@ async function makeReply(event) {
         } else if (text === "いいえ") {
           const nextMassages = [
             "なるほどなるほど...",
-            "じゃあ最後に、それらを踏まえてこれからしたいことも書いてみよう😉"
-          ]
-          mes = nextMassages.map(text => ({ type: "text", text }));
+            "じゃあ最後に、それらを踏まえてこれからしたいことも書いてみよう😉",
+          ];
+          mes = nextMassages.map((text) => ({ type: "text", text }));
           userStates[userId] = "dailyFuture";
           console.log("dailyFutureに変更");
-        }else {
-          mes = { type: "flex", altText: "他にもありそう？🤔", contents: askToContinue() };
+        } else {
+          mes = {
+            type: "flex",
+            altText: "他にもありそう？🤔",
+            contents: askToContinue(),
+          };
           console.log("statusはdailyNoticeのまま");
         }
         break;
@@ -276,15 +281,23 @@ async function makeReply(event) {
         } else if (text === "いいえ") {
           const finishMassages = [
             "お疲れ様でした！",
-            "最後に、1日の結果を見てみますか？"
-          ]
-          mes = finishMassages.map(text => ({ type: "text", text }));
-          const flexmessage = { type: "flex", altText: "1日の結果を見てみる？🥺", contents: askViewResult() };
+            "最後に、1日の結果を見てみますか？",
+          ];
+          mes = finishMassages.map((text) => ({ type: "text", text }));
+          const flexmessage = {
+            type: "flex",
+            altText: "1日の結果を見てみる？🥺",
+            contents: askViewResult(),
+          };
           mes.push(flexmessage);
           userStates[userId] = "askViewResult";
           console.log("askViewResultに変更");
-        }else {
-          mes = { type: "flex", altText: "他にもありそう？🤔", contents: askToContinue() };
+        } else {
+          mes = {
+            type: "flex",
+            altText: "他にもありそう？🤔",
+            contents: askToContinue(),
+          };
           console.log("statusはdailyFutureのまま");
         }
         break;
@@ -292,32 +305,29 @@ async function makeReply(event) {
       case "askViewResult":
         if (text === "はい") {
           // 1日分のワードクラウドを作成
-          const image = await makeWordCloudReply(userId, 1);
-          const finishMassages = [
-            "これが1日の結果です！",
-            "以上で、サポートは終了します",
-            "また利用してくださいね🫡"
-          ]
-          mes = finishMassages.map(text => ({ type: "text", text }));
-          mes.push(image);
+          mes = await makeWordCloudReplyMessage(userId, 1);
           userStates[userId] = "Not supported";
           console.log("Not supportedに変更");
         } else if (text === "いいえ") {
           const finishMassages = [
             "了解しました！",
             "それでは、サポートはこれにて終了です",
-            "また利用してくださいね🫡"
-          ]
-          mes = finishMassages.map(text => ({ type: "text", text }));
+            "また利用してくださいね🫡",
+          ];
+          mes = finishMassages.map((text) => ({ type: "text", text }));
           userStates[userId] = "Not supported";
           console.log("Not supportedに変更");
-        }else {
+        } else {
           const finishMassages = [
             "お疲れ様でした！",
-            "最後に、1日の結果を見てみますか？"
-          ]
-          mes = finishMassages.map(text => ({ type: "text", text }));
-          const flexmessage = { type: "flex", altText: "1日の結果を見てみる？🥺", contents: askViewResult() };
+            "最後に、1日の結果を見てみますか？",
+          ];
+          mes = finishMassages.map((text) => ({ type: "text", text }));
+          const flexmessage = {
+            type: "flex",
+            altText: "1日の結果を見てみる？🥺",
+            contents: askViewResult(),
+          };
           mes.push(flexmessage);
           console.log("statusはaskViewResultのまま");
         }
@@ -327,9 +337,9 @@ async function makeReply(event) {
         const finishMassages = [
           "お疲れ様でした！",
           "サポートはこれにて終了です",
-          "また利用してくださいね🫡"
-        ]
-        mes = finishMassages.map(text => ({ type: "text", text }));
+          "また利用してくださいね🫡",
+        ];
+        mes = finishMassages.map((text) => ({ type: "text", text }));
         // addMessage = { type: "flex", altText: "他にもありそう？🤔", contents: askToContinue() };
         // mes.push(addMessage);
         // const latestTopic = await getLatestTopic(userId);
@@ -340,7 +350,7 @@ async function makeReply(event) {
 
       default:
         mes = null;
-        userStates[userId] = "Not supported"
+        userStates[userId] = "Not supported";
         insertData(userId, userStates[userId], text);
     }
   }
@@ -349,26 +359,60 @@ async function makeReply(event) {
   return mes;
 }
 
-async function makeWordCloudReply(userId, date) {
+async function makeWordCloudReplyMessage(userId, date) {
   //TODO:画像生成失敗した時のERRメッセージ
   //TODO:画像生成するためのメッセージが足りない
   const res = await getWordCloud(userId, date);
-  if("result" in res){
-    const wordCloudURL = res.result.url
-    mes = {
+  // const mes = [];
+  if ("result" in res) {
+    const finishMassages = [
+      date + "日分の結果がこれです！",
+      "また利用してくださいね🫡",
+    ];
+    mes = finishMassages.map((text) => ({ type: "text", text }));
+
+    const wordCloudURL = res.result.url;
+    const sentimentType = res.result.sentimentType;
+    const sentimentScore = res.result.sentimentScore;
+    mes.push({
       type: "image",
       originalContentUrl: wordCloudURL[0],
       previewImageUrl: wordCloudURL[0],
-    };
-  }else{
+    });
+    mes.push(getSentimentText(sentimentType, sentimentScore));
+  } else {
     //TODO:0の時，n個以下のとき？
-    mes = { type: "text", text: "もっとジャーナリングしてみよう" }
+    mes = [{ type: "text", text: "もっとジャーナリングしてみよう" }];
   }
+  console.log(mes);
   return mes;
 }
 
-async function postTimeOutMessage(userId){
-  const message = { type: "text", text: "ジャーナルサポートを終了します🫡" }
+function getSentimentText(sentimentType, sentimentScore) {
+  if (sentimentType === "Positive") {
+    if (sentimentScore > 0.6) {
+      message = "君は絶好調だね🤩";
+    } else if (sentimentScore > 0.5) {
+      message = "ハッピーな言葉が多いね🤗";
+    } else if (sentimentScore > 0.4) {
+      message = "とっても楽しそうな頭の中だね😝";
+    } else {
+      message = "わくわくするようなことが書かれているね😊";
+    }
+  } else if (sentimentType === "Negative") {
+    if (sentimentScore > 0.5) {
+      message = "ポジティブな発言が多いと頭の中が明るくなるよ！🥰";
+    } else {
+      message = "楽しくなるようなつぶやきもしてみよう！😝";
+    }
+  } else {
+    message = "穏やかな気持ちで過ごせたね！😊";
+  }
+  return { type: "text", text: message };
+}
+
+async function postTimeOutMessage(userId) {
+  const message = { type: "text", text: "ジャーナルサポートを終了します🫡" };
   try {
     const res = await client.pushMessage(userId, message);
   } catch (error) {
@@ -385,15 +429,15 @@ function timeOutTimer(userId) {
 }
 
 async function startTimeoutTimer(userId, timeoutInSeconds) {
-  const timeoutId = setTimeout(async() => {
-      // タイムアウト時の処理をここに記述
-      const status = userStates[userId]
-      if((status !== "Not supported")&&(status != undefined)&&(status !=null)){
-        // ジャーナルサポート中のタイムアウト
-        await postTimeOutMessage(userId);
-      }
-      userStates[userId] = "Not supported"
-      delete userTimeouts[userId];
+  const timeoutId = setTimeout(async () => {
+    // タイムアウト時の処理をここに記述
+    const status = userStates[userId];
+    if (status !== "Not supported" && status != undefined && status != null) {
+      // ジャーナルサポート中のタイムアウト
+      await postTimeOutMessage(userId);
+    }
+    userStates[userId] = "Not supported";
+    delete userTimeouts[userId];
   }, timeoutInSeconds); // timeoutInSecondsは秒単位の時間
 
   // タイムアウトIDをユーザーごとに保存
