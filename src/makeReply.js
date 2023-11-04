@@ -88,6 +88,12 @@ async function makeReply(event) {
     mes.push(image);
     userStates[userId] = "Not supported";
     console.log("Not supportedに変更");
+  }else if(text === "自由につぶやく"){
+    //フリーモード開始時の返答
+    const freeModeMassages = [
+      "思ったことや，やりたいことを自由につぶやいてね✌️",
+    ];
+    mes = freeModeMassages.map((text) => ({ type: "text", text }));
   } else {
 
     if ((text !== "はい" && text !== "いいえ" ) && userStates[userId]){
