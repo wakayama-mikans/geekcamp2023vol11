@@ -12,7 +12,7 @@ const userStates = {};
 async function makeReply(event) {
   const userId = event.source.userId; // LINEのユーザーID
   const text = event.message.text; // ユーザーが送信したテキスト
-  let mes;
+  let mes = [];
 
   if(text === "ジャーナルサポート"){
     mes = { type: "flex", altText: "ジャーナルサポート", contents: selectJanalMode() };
@@ -52,33 +52,39 @@ async function makeReply(event) {
 
   } else if (text === "1日の結果を見せて！") {
     const image = await makeWordCloudReply(userId, 1);
-    const finishMassages = [
-      "1日分の結果がこれです！",
-      "また利用してくださいね🫡"
-    ]
-    mes = finishMassages.map(text => ({ type: "text", text }));
+    if(image.type === "image"){
+      const finishMassages = [
+        "1日分の結果がこれです！",
+        "また利用してくださいね🫡",
+      ];
+      mes = finishMassages.map((text) => ({ type: "text", text }));
+    }
     mes.push(image);
     userStates[userId] = "Not supported";
     console.log("Not supportedに変更");
   } else if (text === "1週間の結果を見せて！") {
     // 7日分のワードクラウドを作成
     const image = await makeWordCloudReply(userId, 7);
-    const finishMassages = [
-      "1週間分の結果がこれです！",
-      "また利用してくださいね🫡"
-    ]
-    mes = finishMassages.map(text => ({ type: "text", text }));
+    if (image.type === "image") {
+      const finishMassages = [
+        "1週間分の結果がこれです！",
+        "また利用してくださいね🫡",
+      ];
+      mes = finishMassages.map((text) => ({ type: "text", text }));
+    }
     mes.push(image);
     userStates[userId] = "Not supported";
     console.log("Not supportedに変更");
   } else if (text === "1ヶ月の結果を見せて！") {
     // 30日分のワードクラウドを作成
     const image = await makeWordCloudReply(userId, 30);
-    const finishMassages = [
-      "1か月の結果がこれです！",
-      "また利用してくださいね🫡"
-    ]
-    mes = finishMassages.map(text => ({ type: "text", text }));
+    if (image.type === "image") {
+      const finishMassages = [
+        "1か月の結果がこれです！",
+        "また利用してくださいね🫡",
+      ];
+      mes = finishMassages.map((text) => ({ type: "text", text }));
+    }
     mes.push(image);
     userStates[userId] = "Not supported";
     console.log("Not supportedに変更");
