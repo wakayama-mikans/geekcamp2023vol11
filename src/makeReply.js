@@ -84,8 +84,13 @@ async function makeReply(event) {
     console.log("Not supportedに変更");
   } else {
 
-    if ((text !== "はい" && text !== "いいえ" ) && userStates[userId]){
-      // id, status, textをDBに格納
+    // DB格納処理
+    if (userStates[userId]) {
+      if (text !== "はい" && text !== "いいえ") {
+        insertData(userId, userStates[userId], text);
+      }
+    } else {
+      userStates[userId] = "Not supported";
       insertData(userId, userStates[userId], text);
     }
 
@@ -319,8 +324,6 @@ async function makeReply(event) {
 
       default:
         mes = null;
-        userStates[userId] = "Not supported"
-        insertData(userId, userStates[userId], text);
     }
   }
 
