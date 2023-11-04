@@ -7,4 +7,5 @@ COPY ./package-lock.json /app
 RUN npm install
 
 COPY . /app
-CMD ["npm", "run", "start"]
+RUN npm install firebase-tools -g
+# CMD ["npm", "run", "start"]

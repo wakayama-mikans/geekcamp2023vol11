@@ -5,9 +5,13 @@ const { howToUseing } = require("./flexmessages/howToUse.js"); // 返信生成�
 const express = require("express");
 const PORT = process.env.EXPRESS_PORT;
 const { insertUserId } = require("./database.js");
-
-// ExpressアプリケーションのPOSTルート "/webhook" に対するハンドラ関数
+const functions = require("firebase-functions");
+const cors = require("cors");
 const app = express();
+
+// Automatically allow cross-origin requests
+app.use(cors({ origin: true }));
+
 app.post("/webhook", line.middleware(config), (req, res) => {
   console.log(req.body.events);
 
@@ -26,6 +30,7 @@ async function handleEvent(event) {
     // "follow" イベントの処理
     const userId = event.source.userId; // LINEのユーザーID
     await insertUserId(userId);
+
     mes = {
       type: "flex",
       altText: "使い方はこちら！🙂",
@@ -45,7 +50,7 @@ async function handleEvent(event) {
 }
 
 // 指定のポートで起動
-app.listen(PORT);
+// app.listen(PORT);
 // console.log(`Server running at ${PORT}`);
 
 // 定期実行
@@ -61,3 +66,4 @@ cron.schedule("0 0 9 * * *", () => {
 // cron.schedule('1 * * * * *', () => {
 //     postMorningMessage(client);
 // });
+exports.line = functions.https.onRequest(app);

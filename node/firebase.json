@@ -1,0 +1,12 @@
+{
+  "hosting": {
+    "public": "./",
+    "rewrites": [
+      {
+        "source": "/webhook",
+        "function": "line"
+      }
+    ],
+    "ignore": ["firebase.json", "**/.*", "**/node_modules/**"]
+  }
+}
