@@ -3,8 +3,11 @@ fastapi
 uvicorn
 starlette
 wordcloud
-matplotlib
+# matplotlib
 Image
 pydantic
-japanize-matplotlib
+# japanize-matplotlib
 numpy
+urllib3
+requests
+python-dotenv

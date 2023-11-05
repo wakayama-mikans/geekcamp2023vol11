@@ -1,25 +1,28 @@
 const axios = require("axios");
-const fastApiUrl = "http://fastapi:8888";
 const { bucket } = require("./firebase-config.js");
 const { getTextByDate } = require("./database.js");
 const { analysisSentiment } = require("./analysissentiment.js"); // 感情分析API
 const { getAnalyzedWord } = require("./analysiswords.js"); // 形態素解析API
+const { getStopWords } = require("./stopwords.js"); // ストップワード取得API
 
-// const fs = require("fs");
-// const { promisify } = require("util");
-// const writeFile = promisify(fs.writeFile);
+const fs = require("fs");
+const { promisify } = require("util");
+const writeFile = promisify(fs.writeFile);
 
 async function getWordCloud(userId, date) {
-  //TODO:WordCloud生成の引数設定：listから文字列変換（頻度分析・感情分析・形態素解析）をどうやるかによって分かれそう
   const targetTextData = await getTextByDate(userId, date);
   // console.log(targetTextData);
   // console.log(targetTextData.length);
-  const len_text = targetTextData.length; // 取得したテキストの数
-  if (len_text == 0) {
-    return {err: "NoText"}
+  if (targetTextData && targetTextData.length > 0) {
+    const len_text = targetTextData.length; // 取得したテキストの数
+  } else {
+    return { err: "NoText" };
   }
   const line_text = targetTextData.join(" "); // 取得したテキストを1文章に結合
   const arr_tmp = await getSentiment(line_text); // 感情分析APIに送信
+
+  const sentimentType = arr_tmp[0];
+  const sentimentScore = arr_tmp[1];
 
   // YahooAPIで形態素解析
   words = await getAnalyzedWord(line_text)
@@ -33,6 +36,9 @@ async function getWordCloud(userId, date) {
 
   let myDictionary = {}; // 単語の辞書
 
+  // ストップワードを取得
+  const stopWords = getStopWords();
+
   // 品詞でフィルタリング
   for (var i = 0; i < words.length; i++) {
     if (
@@ -40,41 +46,70 @@ async function getWordCloud(userId, date) {
       words[i][3] == "動詞" ||
       words[i][3] == "形容詞"
     ) {
-      // 単語が初登場なら辞書に追加
-      if (myDictionary[words[i][0]] == null) {
-        myDictionary[words[i][0]] = 1;
-      } else {
-        myDictionary[words[i][0]] += 1;
+      // ストップワードを除外
+      if (stopWords.includes(words[i][0]) == false) {
+        // 単語が初登場なら辞書に追加
+        if (myDictionary[words[i][0]] == null) {
+          myDictionary[words[i][0]] = 1;
+        } else {
+          myDictionary[words[i][0]] += 1;
+        }
       }
     }
   }
 
   // FastAPIに送信するデータ
   const inputData = {
-    text: JSON.stringify(myDictionary),
-    sentiment: arr_tmp,
+    text: myDictionary,
+    sentiment: arr_tmp[0],
+    score: arr_tmp[1],
   };
 
-  //バイナリデータをPNG変換してFirebaseStorageに保存
+  //WordCLoud生成
   const binaryData = await getBinaryData(inputData);
-  //TODO:画像の保存保存場所の検討 現状はUserID.pngを更新し続けている（A：ランダム生成，B：作成後に削除，C：ファイル更新（<-現状これ)
-  const fileName = userId + ".png";
-  const file = bucket.file(fileName); // アップロードするファイルの名前を指定
+  //Storage保存
+  const url = await storeWordCloud(userId, binaryData);
+
+  return { result: { url, sentimentType, sentimentScore } };
+}
+
+async function storeWordCloud(userId, binaryData) {
+  //ファイルの削除
+  const files = await bucket.getFiles({
+    startOffset: `wordClouds/${userId}/`,
+  });
+  for (const item of files[0]) {
+    await bucket.file(item.name).delete();
+  }
+
+  //ファイルの保存
+  const now = new Date();
+  const nowStr =
+    "" +
+    now.getFullYear() +
+    (now.getMonth() + 1) +
+    now.getDate() +
+    now.getHours() +
+    now.getMinutes() +
+    now.getSeconds();
+  const fileName = nowStr + ".png";
+  const filePath = "wordClouds/" + userId + "/" + fileName;
+  const file = bucket.file(filePath);
   await file.save(binaryData, {
     contentType: "image/png", // ファイルのコンテンツタイプを指定
   });
 
-  const url = await bucket.file(fileName).getSignedUrl({
+  const url = await bucket.file(filePath).getSignedUrl({
     action: "read",
     expires: "12-31-3020", //1000年後に設定
   });
 
-  return {result: {url}};
+  return url;
 }
 
 async function getBinaryData(inputData) {
   try {
-    const response = await axios.post(`${fastApiUrl}/test`, inputData);
+    const response = await axios.post(`${process.env.GOOGLE_FUNCTIONS_URL}`, inputData);
     if (response.data && typeof response.data.image === "string") {
       // Base64エンコードされた文字列をデコードしてバイナリに変換
       const binaryData = Buffer.from(response.data.image, "base64");
@@ -101,8 +136,11 @@ async function getSentiment(line_text) {
     });
 
   arr_tmp = data.sentiment; // ポジティブ，ネガティブ，ニュートラルのいずれか
+  // console.log("arr_tmp", arr_tmp);
+  score = data.score;
+  // console.log("score", score);
 
-  return arr_tmp;
+  return [arr_tmp, score];
 }
 
 module.exports = { getWordCloud };

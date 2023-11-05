@@ -2,6 +2,7 @@ const { FieldValue } = require("firebase-admin/firestore");
 
 // const db = getFirestore();
 const { db } = require("./firebase-config.js");
+const { async } = require("@firebase/util");
 
 async function getData(userId) {
   const res = await db.collection(userId).get(); // ユーザひとりのドキュメントすべてを取得
@@ -80,4 +81,39 @@ async function insertData(userId, talkStatus, text) {
     .set(data);
 }
 
-module.exports = { insertData, getData, getLatestTopic, getTextByDate };
+async function insertUserId(userId){
+  const data = {
+    userid: userId,
+  }; // FirebaseのDBに追加
+
+  const res = await db
+    .collection("userIdList")
+    .doc(userId)
+    .set(data);
+}
+
+async function getUserIdList(){
+  const res = await db
+    .collection("userIdList")
+    .get();
+  const data = res.docs.map((doc) => doc.data().userid); // ドキュメントのtextフィールドのみを取得
+  return data;
+}
+async function getDocumentCount(userId) {
+
+  console.log("getDocumentCount");
+  // console.log(userId);
+  try {
+    const querySnapshot = await db.collection(userId).get(); // "status" フィールドが "topic" の条件を追加
+
+    const documentCount = querySnapshot.size;
+    return documentCount;
+  } catch (error) {
+    console.error("エラーが発生しました:", error);
+    return -1; // エラー時に-1を返す
+  }
+}
+
+
+module.exports = { insertData, getData, getLatestTopic, getTextByDate, insertUserId, getUserIdList, getDocumentCount};
+
