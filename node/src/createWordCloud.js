@@ -21,6 +21,9 @@ async function getWordCloud(userId, date) {
   const line_text = targetTextData.join(" "); // 取得したテキストを1文章に結合
   const arr_tmp = await getSentiment(line_text); // 感情分析APIに送信
 
+  const sentimentType = arr_tmp[0];
+  const sentimentScore = arr_tmp[1];
+
   // YahooAPIで形態素解析
   words = await getAnalyzedWord(line_text)
     .then((response) => {
@@ -67,7 +70,7 @@ async function getWordCloud(userId, date) {
   //Storage保存
   const url = await storeWordCloud(userId, binaryData);
 
-  return { result: { url } };
+  return { result: { url, sentimentType, sentimentScore } };
 }
 
 async function storeWordCloud(userId, binaryData) {

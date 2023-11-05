@@ -1,21 +1,13 @@
 require("dotenv").config();
-const { makeReply } = require("./makeReply.js");// 返信生成用の関数を読み込む
-const { howToUseing } = require("./flexmessages/howToUse.js");// 返信生成用の関数を読み込む
+const { line, config, client } = require("./lineClient.js");
+const { makeReply } = require("./makeReply.js"); // 返信生成用の関数を読み込む
+const { howToUseing } = require("./flexmessages/howToUse.js"); // 返信生成用の関数を読み込む
 const express = require("express");
-const line = require("@line/bot-sdk");
 const PORT = process.env.EXPRESS_PORT;
-
-// env呼び出し
-const config = {
-  channelSecret: process.env.LINE_CHANNEL_SECRET,
-  channelAccessToken: process.env.LINE_ACCESS_TOKEN
-};
-
-// インスタンス生成
-const app = express();
-const client = new line.Client(config);
+const { insertUserId } = require("./database.js");
 
 // ExpressアプリケーションのPOSTルート "/webhook" に対するハンドラ関数
+const app = express();
 app.post("/webhook", line.middleware(config), (req, res) => {
   console.log(req.body.events);
 
@@ -29,14 +21,19 @@ async function handleEvent(event) {
   // メッセージにのみ返信 followではフレックスメッセージを送信
   if (event.type === "message" && event.message.type === "text") {
     // メッセージイベントの処理
-    mes = await makeReply(event);
+    mes = await makeReply(event,client);
   } else if (event.type === "follow") {
     // "follow" イベントの処理
-    mes = { type: "flex", altText: "使い方はこちら！🙂", contents: howToUseing() }; // howToUseing() 関数を呼び出す
+    const userId = event.source.userId; // LINEのユーザーID
+    await insertUserId(userId);
+    mes = {
+      type: "flex",
+      altText: "使い方はこちら！🙂",
+      contents: howToUseing(),
+    }; // howToUseing() 関数を呼び出す
   } else {
     return Promise.resolve(null);
   }
-
 
   // メッセージが空の場合は返信無し
   if (mes == null) {
@@ -50,3 +47,17 @@ async function handleEvent(event) {
 // 指定のポートで起動
 app.listen(PORT);
 // console.log(`Server running at ${PORT}`);
+
+// 定期実行
+const cron = require("node-cron");
+const { postMorningMessage } = require("./regularExecution.js");
+
+//朝9時に実行
+cron.schedule("0 0 9 * * *", () => {
+  postMorningMessage(client);
+});
+
+//Debug用1分に1回実行
+// cron.schedule('1 * * * * *', () => {
+//     postMorningMessage(client);
+// });
