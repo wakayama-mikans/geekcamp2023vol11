@@ -472,7 +472,7 @@ async function getAgreementMessages(userId){
 
   const randomPraiseIndex = Math.floor(Math.random() * praiseMessages.length);
 
-  if (docCount % 5 === 0) {
+  if (docCount % 10 === 0) {
     // docCountが5の倍数の場合に追加のコメントを送信
     response.push({ type: "text", text: "今までのつぶやきが" + docCount.toString() + "件に到達しました！" });
     response.push({ type: "text", text: praiseMessages[randomPraiseIndex]});
