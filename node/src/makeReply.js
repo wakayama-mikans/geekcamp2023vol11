@@ -65,11 +65,13 @@ async function makeReply(event) {
     };
   } else if (text === "結果がみたい") {
     // 期間選択フレックスメッセージの送信
-    mes = {
+    mes = { type: "text", text: "生成には時間がかかります🥺\n少し待ってね！" };
+    const flexmessage = {
       type: "flex",
       altText: "結果を見てみよう！😎",
       contents: choiceSpan(),
     };
+    mes.push(flexmessage)
   } else if (
     text === "1日の結果を見せて！" ||
     text === "1週間の結果を見せて！" ||
@@ -289,6 +291,7 @@ async function makeReply(event) {
           const finishMassages = [
             "お疲れ様でした！",
             "最後に、1日の結果を見てみますか？",
+            "結果の生成には少し時間がかかります🥺\n少し待ってね！"
           ];
           mes = finishMassages.map((text) => ({ type: "text", text }));
           const flexmessage = {
@@ -328,6 +331,7 @@ async function makeReply(event) {
           const finishMassages = [
             "お疲れ様でした！",
             "最後に、1日の結果を見てみますか？",
+            "結果の生成には少し時間がかかります🥺\n少し待ってね！"
           ];
           mes = finishMassages.map((text) => ({ type: "text", text }));
           const flexmessage = {
@@ -405,7 +409,8 @@ async function makeWordCloudReplyMessage(userId, date) {
     mes.push(getSentimentText(sentimentType, sentimentScore));
   } else {
     //TODO:0の時，n個以下のとき？
-    mes = [{ type: "text", text: "もっとジャーナリングしてみよう" }];
+    mes = [{ type: "text", text: "投稿が足りないよ💦" }];
+    mes.push({ type: "text", text: "もっとジャーナリングしてみよう" });
   }
   console.log(mes);
   return mes;
