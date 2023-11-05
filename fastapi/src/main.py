@@ -1,12 +1,11 @@
 from typing import Union
 from fastapi import FastAPI
 from pydantic import BaseModel
-import create_wordcloud as create_wordcloud # ワードクラウド生成のPythonファイルをインポート
-
+from src.create_wordcloud import create_wordcloud
 
 # ここでnode側からのデータを受け取るためのクラスを定義
 class RequestData(BaseModel):
-    text: str
+    text: dict
     sentiment: str
     score: float
 
@@ -16,9 +15,10 @@ app = FastAPI()
 def read_root():
     return {"Hello": "World"}
 
-@app.post("/test")
+@app.post("/")
 async def process_text(request_data: RequestData):
-    base64_data = create_wordcloud.create_wordcloud(request_data) # ワードクラウドの生成
+    request_json = vars(request_data)
+    base64_data = create_wordcloud(request_json) # ワードクラウドの生成
     return {"image": str(base64_data)}
 
 # @app.get("/items/{item_id}")

@@ -8,3 +8,6 @@ Image
 pydantic
 # japanize-matplotlib
 numpy
+urllib3
+requests
+python-dotenv

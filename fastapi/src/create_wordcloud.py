@@ -1,19 +1,30 @@
 from wordcloud import WordCloud
 import base64
+import urllib.request 
 from PIL import Image
 import numpy as np
 import subprocess
-import json
 import io
+import requests
+from dotenv import load_dotenv
+import os
+
+load_dotenv()
 
 # ワードクラウドを生成する関数
 def create_wordcloud(inputData):
-    fpath = "/usr/share/fonts/opentype/ipaexfont-gothic/ipaexg.ttf" # 日本語フォントのパスを指定
-    mask_array = np.array(Image.open('./mask.png')) # マスク画像の読み込み
 
-    word_frequencies = json.loads(inputData.text) # json形式のテキストデータを辞書型に変換
-    sentiment = inputData.sentiment # 感情分析の結果
-    score = inputData.score # 感情分析の結果
+    urllib.request.urlretrieve( 
+        os.getenv("MASK_URL"),
+        "mask.png") 
+    
+    img_mask = Image.open("mask.png") 
+
+    mask_array = np.array(img_mask) # マスク画像の読み込み
+
+    word_frequencies = inputData["text"]
+    sentiment = inputData["sentiment"] # 感情分析の結果
+    score = inputData["score"] # 感情分析の結果
 
     # 感情分析の結果によってワードクラウドの色を変える
     if sentiment == "Positive":
@@ -35,6 +46,17 @@ def create_wordcloud(inputData):
     else:
         sentiment_color = "summer"
     # print(sentiment_color)
+
+    # GoogleフォントのダウンロードURL
+    font_url = os.getenv("FONT_URL")
+
+    # ダウンロードして一時ファイルとして保存
+    r = requests.get(font_url)
+    with open("notosans_font.ttf", 'wb') as f:
+        f.write(r.content)
+
+    # ダウンロードしたフォントを使用してWordCloudを生成
+    fpath = 'notosans_font.ttf'
 
     # ワードクラウドを生成
     wordcloud = WordCloud(font_path=fpath,

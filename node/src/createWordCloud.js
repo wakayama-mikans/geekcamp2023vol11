@@ -1,5 +1,4 @@
 const axios = require("axios");
-const fastApiUrl = "http://fastapi:8888";
 const { bucket } = require("./firebase-config.js");
 const { getTextByDate } = require("./database.js");
 const { analysisSentiment } = require("./analysissentiment.js"); // 感情分析API
@@ -61,9 +60,9 @@ async function getWordCloud(userId, date) {
 
   // FastAPIに送信するデータ
   const inputData = {
-    text: JSON.stringify(myDictionary),
-    sentiment: sentimentType,
-    score: sentimentScore,
+    text: myDictionary,
+    sentiment: arr_tmp[0],
+    score: arr_tmp[1],
   };
 
   //WordCLoud生成
@@ -110,7 +109,7 @@ async function storeWordCloud(userId, binaryData) {
 
 async function getBinaryData(inputData) {
   try {
-    const response = await axios.post(`${fastApiUrl}/test`, inputData);
+    const response = await axios.post(`${process.env.GOOGLE_FUNCTIONS_URL}`, inputData);
     if (response.data && typeof response.data.image === "string") {
       // Base64エンコードされた文字列をデコードしてバイナリに変換
       const binaryData = Buffer.from(response.data.image, "base64");
@@ -137,7 +136,9 @@ async function getSentiment(line_text) {
     });
 
   arr_tmp = data.sentiment; // ポジティブ，ネガティブ，ニュートラルのいずれか
+  // console.log("arr_tmp", arr_tmp);
   score = data.score;
+  // console.log("score", score);
 
   return [arr_tmp, score];
 }
