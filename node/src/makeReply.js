@@ -1,4 +1,4 @@
-const { insertData, getLatestTopic, getTextByDate } = require("./database.js"); // データベース関連の関数をdatabase.jsから読み込む
+const { insertData, getLatestTopic, getTextByDate, getDocumentCount } = require("./database.js"); // データベース関連の関数をdatabase.jsから読み込む
 const { otherOpinions } = require("./flexmessages/otherOpinions.js");
 const {
   askToContinue,
@@ -87,6 +87,7 @@ async function makeReply(event) {
     userStates[userId] = "Not supported";
   } else if (text === "自由につぶやく") {
     //フリーモード開始時の返答
+
     //TODO:フリーモードのフレックスメッセージ
     const flexmessage = {
       type: "flex",
@@ -351,7 +352,7 @@ async function makeReply(event) {
           ];
           mes = freeModeMassages.map((text) => ({ type: "text", text }));
         }else{
-          mes = getAgreementMessages()
+          mes = getAgreementMessages(userId)
         }
         
         break;
@@ -466,7 +467,8 @@ async function startTimeoutTimer(userId, timeoutInSeconds) {
   userTimeouts[userId] = timeoutId;
 }
 
-function getAgreementMessages(){
+async function getAgreementMessages(userId){
+  console.log("getAgreementMessages")
   const agreementMessages = [
     "そうなんだ！😊",
     "なるほど...🤔",
@@ -474,7 +476,25 @@ function getAgreementMessages(){
     "すごくいいね😄",
   ];
   const randomIndex = Math.floor(Math.random() * agreementMessages.length);
-  return [{type:"text",text: agreementMessages[randomIndex]}];
+  const docCount = await getDocumentCount(userId);
+
+  let response = [{ type: "text", text: agreementMessages[randomIndex] }];
+
+  const praiseMessages = [
+    "その調子です！",
+    "とってもがんばってるね！😄",
+    "すごい！😊",
+  ]
+
+  const randomPraiseIndex = Math.floor(Math.random() * praiseMessages.length);
+
+  if (docCount % 10 === 0) {
+    // docCountが5の倍数の場合に追加のコメントを送信
+    response.push({ type: "text", text: "今までのつぶやきが" + docCount.toString() + "件に到達しました！" });
+    response.push({ type: "text", text: praiseMessages[randomPraiseIndex]});
+  }
+
+  return response;
 }
 
 function getRandomQuestion(){
