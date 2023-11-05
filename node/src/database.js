@@ -102,6 +102,7 @@ async function getUserIdList(){
 async function getDocumentCount(userId) {
 
   console.log("getDocumentCount");
+  // console.log(userId);
   try {
     const querySnapshot = await db.collection(userId).get(); // "status" フィールドが "topic" の条件を追加
 

@@ -1,16 +1,15 @@
-// const { insertData, getLatestTopic, getTextByDate } = require("./database.js"); // データベース関連の関数をdatabase.jsから読み込む
+const { insertData, getLatestTopic, getTextByDate, getDocumentCount } = require("./database.js"); // データベース関連の関数をdatabase.jsから読み込む
 const { otherOpinions } = require("./flexmessages/otherOpinions.js");
 const {
   askToContinue,
   askViewResult,
+  askFreeModeQuestion
 } = require("./flexmessages/userInteraction.js");
 const { choiceSpan } = require("./flexmessages/viewWordcloud.js");
 const { getWordCloud } = require("./createWordCloud.js");
 const { howToUseing } = require("./flexmessages/howToUse.js");
 const { selectJanalMode } = require("./flexmessages/selectJanalMode.js");
 const { client } = require("./lineClient.js");
-
-const { insertData, getLatestTopic, getDocumentCount } = require("./database.js"); // データベース関連の関数をdatabase.jsから読み込む
 
 // ユーザーごとの状態を管理するオブジェクト
 const userStates = {};
@@ -88,10 +87,14 @@ async function makeReply(event) {
     userStates[userId] = "Not supported";
   } else if (text === "自由につぶやく") {
     //フリーモード開始時の返答
-    const freeModeMassages = [
-      "思ったことや，やりたいことを自由につぶやいてね✌️",
-    ];
-    mes = freeModeMassages.map((text) => ({ type: "text", text }));
+
+    //TODO:フリーモードのフレックスメッセージ
+    const flexmessage = {
+      type: "flex",
+      altText: "自由につぶやく",
+      contents: askFreeModeQuestion(),
+    };
+    mes.push(flexmessage);
     userStates[userId] = "freeMode";
 
   } else {
@@ -338,7 +341,20 @@ async function makeReply(event) {
         break;
       case "freeMode":
         //相槌を返す
-        mes = getAgreementMessages(userId)
+        if(text === "はい"){
+          //ランダムな質問を返す
+          mes = getRandomQuestion()
+        }else if (text === "いいえ") {
+          mes = [{ type: "text", text: "そうなんだ！😊" }];
+          const freeModeMassages = [
+            "了解しました！",
+            "思ったことや，やりたいことを自由につぶやいてね✌️",
+          ];
+          mes = freeModeMassages.map((text) => ({ type: "text", text }));
+        }else{
+          mes = getAgreementMessages(userId)
+        }
+        
         break;
       case "finish":
         const finishMassages = [
@@ -479,6 +495,24 @@ async function getAgreementMessages(userId){
   }
 
   return response;
+}
+
+function getRandomQuestion(){
+  const questionMessages = [
+    "最近嬉しかったことは？",
+    "最近イライラしたことは？",
+    "将来やってみたいことは？",
+    "最近どんな新しい発見があった？",
+    "やってみたい挑戦は？",
+    "心配なことってなんだろう？",
+    "君にとって幸せって何かな？",
+    "一番熱中できることは？",
+    "君のいいところを教えて！！",
+    "君の改善したいところを教えて！！",
+    "周りの人でどんな人にあこがれる？",
+  ];
+  const randomIndex = Math.floor(Math.random() * questionMessages.length);
+  return [{type:"text",text: questionMessages[randomIndex]}];
 }
 
 module.exports = { makeReply };
