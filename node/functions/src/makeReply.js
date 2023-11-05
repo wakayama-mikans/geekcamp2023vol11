@@ -65,7 +65,7 @@ async function makeReply(event) {
     };
   } else if (text === "結果がみたい") {
     // 期間選択フレックスメッセージの送信
-    mes = { type: "text", text: "生成には時間がかかります🥺\n少し待ってね！" };
+    mes = [{ type: "text", text: "生成には時間がかかります🥺\n少し待ってね！" }];
     const flexmessage = {
       type: "flex",
       altText: "結果を見てみよう！😎",
