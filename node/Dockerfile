@@ -8,4 +8,4 @@ RUN npm install
 
 COPY . /app
 RUN npm install firebase-tools -g
-# CMD ["npm", "run", "start"]
+CMD ["npm", "run", "start"]
