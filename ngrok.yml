@@ -10,6 +10,3 @@ tunnels:
 # regionをJapanに変更
 region: jp
 authtoken: $NGROK_AUTH_TOKUN
-authtoken: 2XNYKmzs3YHtQvSuK6c5iILvq62_6v3bUsJVvWpfgEUGRDNkj
-
-authtoken: 2XNYKmzs3YHtQvSuK6c5iILvq62_6v3bUsJVvWpfgEUGRDNkj
